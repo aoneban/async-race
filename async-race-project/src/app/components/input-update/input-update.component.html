@@ -1,0 +1,13 @@
+<div class="update-car">
+  <div>
+    <label for="text-input"></label>
+    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="text" />
+  </div>
+
+  <div>
+    <label for="color-input"></label>
+    <input id="color-input" type="color" [(ngModel)]="color" />
+  </div>
+
+  <button (click)="create()">Update</button>
+</div>

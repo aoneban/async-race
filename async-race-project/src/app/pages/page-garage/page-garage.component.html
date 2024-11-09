@@ -1,4 +1,18 @@
-<p>page-garage works!</p>
-<h1>Hello {{ title }}</h1>
-<a routerLink="/page-winners">Go to Page Winners</a>
-
+<div>
+  <div>
+    <h1>Welcome to {{ title }}</h1>
+    <a routerLink="/">To Garage</a><br />
+    <a routerLink="/page-winners">To Winners</a>
+  </div>
+  <main class="main">
+    <div>
+      <button>Race</button>
+      <button>Reset</button>
+    </div>
+    <app-input-create></app-input-create>
+    <app-input-update></app-input-update>
+    <div>
+      <button>Generate Cars</button>
+    </div>
+  </main>
+</div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { InputCreateComponent } from '../../components/input-create/input-create.component';
 import { InputUpdateComponent } from '../../components/input-update/input-update.component';
+import { CarService } from '../../services/car.service';
 
 interface Car {
   id: number;
@@ -19,20 +20,11 @@ interface Car {
 })
 export class PageGarageComponent implements OnInit {
   title = 'async-race-app';
-  getUrl = 'http://localhost:3000';
-  path = {
-    garage: '/garage',
-    engine: '/engine',
-  };
   cars: Car[] = [];
-
-  async getCars(): Promise<Car[]> {
-    const result = await fetch(`${this.getUrl}${this.path.garage}`);
-    const data = await result.json();
-    return data as Car[];
-  }
-
-  async ngOnInit() {
-    this.cars = await this.getCars();
+  constructor(private carService: CarService) {}
+  ngOnInit(): void {
+    this.carService.getCars().subscribe((cars) => {
+      this.cars = cars;
+    });
   }
 }

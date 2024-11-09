@@ -15,4 +15,28 @@
       <button>Generate Cars</button>
     </div>
   </main>
+  <section class="section-content">
+    <div *ngIf="cars.length > 0; else noCars">
+      <ul>
+        <li class="cars-list" *ngFor="let car of cars">
+          <div>
+            <button>Select</button>
+            <button>Remove</button>
+          </div>
+          <div>
+            <button>A</button>
+            <button>B</button>
+          </div>
+          <div>
+            {{ car.name }}
+            <img src="../../../../../car.svg" alt="car" [ngStyle]="{'color': car.color}" style="width: 100px">
+          </div>
+        </li>
+      </ul>
+    </div>
+    <ng-template #noCars>
+      <p>Cars didn't find</p>
+    </ng-template>
+    <router-outlet></router-outlet>
+  </section>
 </div>

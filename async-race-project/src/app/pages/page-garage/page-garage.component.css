@@ -1,8 +1,30 @@
 .main {
   width: 100%;
-  margin: 30px auto;
+  margin: 30px auto 5px auto;
   padding-bottom: 30px;
   display: flex;
   gap: 3rem;
   border-bottom: 1px solid white;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.cars-list {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 0;
+  border-bottom: 1px solid white;
+}
+
+.cars-list div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 5px;
 }

@@ -18,3 +18,8 @@ body {
 a {
   color: azure;
 }
+
+ul {
+  margin: 0;
+  padding: 0;
+}

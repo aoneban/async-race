@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NewCarDataService } from '../../services/newCarData.service';
+import { CarService } from '../../services/car.service';
 
 @Component({
   selector: 'app-input-create',
@@ -9,10 +11,20 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './input-create.component.css',
 })
 export class InputCreateComponent {
-  text = '';
-  color = '#000000';
-  create() {
-    console.log('Text:', this.text);
-    console.log('Color:', this.color);
+  userText = '';
+  userColor = '#000000';
+
+  constructor(
+    private dataService: NewCarDataService,
+    private carService: CarService
+  ) {}
+
+  generateUniqueId(): number { return Date.now() + Math.floor(Math.random() * 1000); }
+
+  sendData() {
+    const newCar = { id: this.generateUniqueId(), name: this.userText, color: this.userColor };
+    console.log('Adding car:', newCar);
+    this.carService.addCar(newCar);
+    this.dataService.changeData({ text: this.userText, color: this.userColor });
   }
 }

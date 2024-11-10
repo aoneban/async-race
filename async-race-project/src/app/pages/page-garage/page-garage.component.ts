@@ -21,10 +21,13 @@ interface Car {
 export class PageGarageComponent implements OnInit {
   title = 'async-race-app';
   cars: Car[] = [];
+
   constructor(private carService: CarService) {}
+
   ngOnInit(): void {
-    this.carService.getCars().subscribe((cars) => {
+    this.carService.currentCars.subscribe((cars) => {
       this.cars = cars;
+      console.log('Cars updated:', this.cars);
     });
   }
 }

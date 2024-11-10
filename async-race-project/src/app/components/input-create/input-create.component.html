@@ -1,13 +1,12 @@
 <div class="create-car">
   <div>
     <label for="text-input"></label>
-    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="text" />
+    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="userText" />
   </div>
 
   <div>
-    <label for="color-input"></label>
-    <input id="color-input" type="color" [(ngModel)]="color" />
+    <input id="color-input" type="color" [(ngModel)]="userColor" />
   </div>
 
-  <button (click)="create()">Create</button>
+  <button (click)="sendData()">Create</button>
 </div>

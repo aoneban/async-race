@@ -19,7 +19,6 @@ interface Car {
   templateUrl: './page-garage.component.html',
   styleUrl: './page-garage.component.css',
 })
-
 export class PageGarageComponent implements OnInit {
   title = 'async-race-app';
   cars: Car[] = [];
@@ -54,5 +53,9 @@ export class PageGarageComponent implements OnInit {
     if (this.currentPage > 1) {
       this.currentPage--;
     }
+  }
+
+  deleteCar(id: number) {
+    this.carService.deleteCar(id);
   }
 }

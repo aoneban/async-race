@@ -19,6 +19,7 @@
     <div *ngIf="cars.length > 0; else noCars">
       <ul>
         <li class="cars-list" *ngFor="let car of paginatedCars">
+          <button (click)="deleteCar(car.id)">Remove</button>
           <div>
             <p>Car ID: {{ car.id }}</p>
             <p>Car Brand: {{ car.name }}</p>

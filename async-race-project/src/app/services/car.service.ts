@@ -10,7 +10,7 @@ interface Car {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CarService {
   private carsSource = new BehaviorSubject<Car[]>([]);
@@ -23,17 +23,21 @@ export class CarService {
   }
 
   loadInitialCars() {
-    this.getCarsFromApi().subscribe(cars => this.carsSource.next(cars));
+    this.getCarsFromApi().subscribe((cars) => this.carsSource.next(cars));
   }
 
   getCarsFromApi(): Observable<Car[]> {
-    return this.http.get<Car[]>(this.apiUrl).pipe(
-      tap(cars => this.carsSource.next(cars))
-    );
+    return this.http.get<Car[]>(this.apiUrl).pipe(tap((cars) => this.carsSource.next(cars)));
   }
 
   addCar(car: Car) {
     const currentCars = this.carsSource.value;
     this.carsSource.next([...currentCars, car]);
+  }
+
+  deleteCar(id: number) {
+    const currentCars = this.carsSource.value;
+    const updatedCars = currentCars.filter((car) => car.id !== id);
+    this.carsSource.next(updatedCars);
   }
 }

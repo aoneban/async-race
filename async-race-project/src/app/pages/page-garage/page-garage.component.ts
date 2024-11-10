@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { InputCreateComponent } from '../../components/input-create/input-create.component';
 import { InputUpdateComponent } from '../../components/input-update/input-update.component';
+import { InputHundredComponent } from '../../components/input-hundred/input-hundred.component';
 import { CarService } from '../../services/car.service';
 
 interface Car {
@@ -14,10 +15,11 @@ interface Car {
 @Component({
   selector: 'app-page-garage',
   standalone: true,
-  imports: [CommonModule, RouterModule, InputCreateComponent, InputUpdateComponent],
+  imports: [CommonModule, RouterModule, InputCreateComponent, InputUpdateComponent, InputHundredComponent],
   templateUrl: './page-garage.component.html',
   styleUrl: './page-garage.component.css',
 })
+
 export class PageGarageComponent implements OnInit {
   title = 'async-race-app';
   cars: Car[] = [];

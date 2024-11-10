@@ -12,7 +12,7 @@
     <app-input-create></app-input-create>
     <app-input-update></app-input-update>
     <div>
-      <button>Generate Cars</button>
+    <app-input-hundred></app-input-hundred>
     </div>
   </main>
   <section class="section-content">
@@ -32,6 +32,6 @@
         <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
       </div>
     </div>
-    <ng-template #noCars> <p>Машины не найдены.</p> </ng-template>
+    <ng-template #noCars> <p>Cars didn't find.</p> </ng-template>
   </section>
 </div>

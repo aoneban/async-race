@@ -19,11 +19,16 @@ export class InputCreateComponent {
     private carService: CarService
   ) {}
 
-  generateUniqueId(): number { return Date.now() + Math.floor(Math.random() * 1000); }
+  generateUniqueId(): number {
+    return Date.now() + Math.floor(Math.random() * 1000);
+  }
 
   sendData() {
+    if (!this.userText) {
+      alert('Please enter a car brand.');
+      return;
+    }
     const newCar = { id: this.generateUniqueId(), name: this.userText, color: this.userColor };
-    console.log('Adding car:', newCar);
     this.carService.addCar(newCar);
     this.dataService.changeData({ text: this.userText, color: this.userColor });
   }

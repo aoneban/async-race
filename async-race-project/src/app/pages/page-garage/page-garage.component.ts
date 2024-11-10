@@ -21,13 +21,36 @@ interface Car {
 export class PageGarageComponent implements OnInit {
   title = 'async-race-app';
   cars: Car[] = [];
+  currentPage = 1;
+  itemsCarPages = 7;
 
   constructor(private carService: CarService) {}
 
   ngOnInit(): void {
     this.carService.currentCars.subscribe((cars) => {
       this.cars = cars;
-      console.log('Cars updated:', this.cars);
     });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.cars.length / this.itemsCarPages);
+  }
+
+  get paginatedCars(): Car[] {
+    const startIndex = (this.currentPage - 1) * this.itemsCarPages;
+    const endIndex = startIndex + this.itemsCarPages;
+    return this.cars.slice(startIndex, endIndex);
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
   }
 }

@@ -18,7 +18,7 @@
   <section class="section-content">
     <div *ngIf="cars.length > 0; else noCars">
       <ul>
-        <li class="cars-list" *ngFor="let car of cars">
+        <li class="cars-list" *ngFor="let car of paginatedCars">
           <div>
             <p>Car ID: {{ car.id }}</p>
             <p>Car Brand: {{ car.name }}</p>
@@ -26,6 +26,11 @@
           </div>
         </li>
       </ul>
+      <div class="pagination-controls">
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
+      </div>
     </div>
     <ng-template #noCars> <p>Машины не найдены.</p> </ng-template>
   </section>

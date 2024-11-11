@@ -9,15 +9,20 @@ import { CarService } from '../../services/car.service';
   styleUrl: './input-hundred.component.css',
 })
 export class InputHundredComponent {
+  userText = '';
+  userColor = '#000000';
   constructor(private carService: CarService) {}
 
   generateUniqueId(): number {
     return Date.now() + Math.floor(Math.random() * 1000);
   }
+
   generateCars(count: number): void {
     for (let i = 0; i < count; i++) {
-      const newCar = { id: this.generateUniqueId(), name: `Car ${i + 1}`, color: this.getRandomColor() };
-      this.carService.addCar(newCar);
+      const newCar = { name: `Car ${i + 1}`, color: this.getRandomColor() };
+      this.carService.createCar(newCar).subscribe(() => {
+        this.resetForm();
+      });
     }
   }
   getRandomColor(): string {
@@ -27,5 +32,9 @@ export class InputHundredComponent {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+  }
+  resetForm(): void {
+    this.userText = '';
+    this.userColor = '#000000';
   }
 }

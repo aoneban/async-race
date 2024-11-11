@@ -17,9 +17,9 @@ export class InputCreateComponent {
     private carService: CarService
   ) {}
 
-  generateUniqueId(): number {
+/*   generateUniqueId(): number {
     return Date.now() + Math.floor(Math.random() * 1000);
-  }
+  } */
 
   createCar() {
     const newCar = { name: this.userText, color: this.userColor };

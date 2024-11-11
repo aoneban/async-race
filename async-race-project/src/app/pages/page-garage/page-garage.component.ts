@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { InputCreateComponent } from '../../components/input-create/input-create.component';
@@ -6,6 +6,7 @@ import { InputUpdateComponent } from '../../components/input-update/input-update
 import { InputHundredComponent } from '../../components/input-hundred/input-hundred.component';
 import { CarService } from '../../services/car.service';
 import { ServiceId } from '../../services/service-id.service';
+import { EngineControlComponent } from '../../components/engine-control/engine-control.component';
 
 interface Car {
   id: number;
@@ -16,7 +17,14 @@ interface Car {
 @Component({
   selector: 'app-page-garage',
   standalone: true,
-  imports: [CommonModule, RouterModule, InputCreateComponent, InputUpdateComponent, InputHundredComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    InputCreateComponent,
+    InputUpdateComponent,
+    InputHundredComponent,
+    EngineControlComponent,
+  ],
   templateUrl: './page-garage.component.html',
   styleUrl: './page-garage.component.css',
 })
@@ -28,13 +36,25 @@ export class PageGarageComponent implements OnInit {
 
   constructor(
     private carService: CarService,
-    private serviceId: ServiceId
+    private serviceId: ServiceId,
   ) {}
 
   ngOnInit(): void {
     this.carService.currentCars.subscribe((cars) => {
       this.cars = cars;
     });
+  }
+
+  @ViewChild(EngineControlComponent) engineControl!: EngineControlComponent;
+  startEngine(carId: number): void {
+    if (this.engineControl) {
+      this.engineControl.startEngine(carId);
+    }
+  }
+  stopEngine(carId: number): void {
+    if (this.engineControl) {
+      this.engineControl.stopEngine(carId);
+    }
   }
 
   get totalPages(): number {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -7,6 +7,11 @@ interface Car {
   id: number;
   name: string;
   color: string;
+}
+
+interface EngineStatus {
+  velocity: number;
+  distance: number;
 }
 
 @Injectable({
@@ -17,6 +22,7 @@ export class CarService {
   currentCars = this.carsSource.asObservable();
 
   private apiUrl = 'http://localhost:3000/garage';
+  private apiUrl2 = 'http://localhost:3000/engine';
 
   constructor(private http: HttpClient) {
     this.loadInitialCars();
@@ -62,5 +68,10 @@ export class CarService {
         this.carsSource.next(updatedCars);
       })
     );
+  }
+
+  controlEngine(id: number, status: 'started' | 'stopped' | 'drive'): Observable<EngineStatus> {
+    const params = new HttpParams().set('id', id.toString()).set('status', status);
+    return this.http.patch<EngineStatus>(`${this.apiUrl2}`, {}, { params });
   }
 }

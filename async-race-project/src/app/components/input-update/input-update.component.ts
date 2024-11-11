@@ -40,7 +40,7 @@ export class InputUpdateComponent implements OnInit {
       this.carService.updateCar(newCar);
       this.resetForm();
     } else {
-      alert('No car ID selected.');
+      alert('Choose the car for updating.');
     }
   }
   resetForm(): void {

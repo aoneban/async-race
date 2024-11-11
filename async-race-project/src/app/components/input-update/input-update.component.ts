@@ -14,6 +14,7 @@ export class InputUpdateComponent implements OnInit {
   selectedId: number | null = null;
   text = '';
   color = '#000000';
+  selectedCar: null | undefined;
 
   constructor(
     private carService: CarService,
@@ -30,15 +31,17 @@ export class InputUpdateComponent implements OnInit {
     });
   }
 
-  updateData(): void {
+  updateCar(): void {
     if (!this.text) {
       alert('Please enter a car brand.');
       return;
     }
     if (this.selectedId !== null) {
-      const newCar = { id: this.selectedId, name: this.text, color: this.color };
-      this.carService.updateCar(newCar);
-      this.resetForm();
+      const updatedCar = { id: this.selectedId, name: this.text, color: this.color };
+      this.carService.updateCar(updatedCar).subscribe((car) => {
+        console.log('Car updated:', car);
+        this.resetForm();
+      });
     } else {
       alert('Choose the car for updating.');
     }

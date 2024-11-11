@@ -34,7 +34,7 @@ export class CarService {
     const currentCars = this.carsSource.value;
     this.carsSource.next([...currentCars, car]);
   }
-  
+
   createCar(car: { name: string; color: string }): Observable<Car> {
     return this.http.post<Car>(this.apiUrl, car).pipe(
       tap((newCar) => {
@@ -54,9 +54,13 @@ export class CarService {
     );
   }
 
-  updateCar(updatedCar: Car): void {
-    const currentCars = this.carsSource.value;
-    const updatedCars = currentCars.map((car) => (car.id === updatedCar.id ? updatedCar : car));
-    this.carsSource.next(updatedCars);
+  updateCar(updatedCar: Car): Observable<Car> {
+    return this.http.put<Car>(`${this.apiUrl}/${updatedCar.id}`, updatedCar).pipe(
+      tap((newCar) => {
+        const currentCars = this.carsSource.value;
+        const updatedCars = currentCars.map((car) => (car.id === updatedCar.id ? newCar : car));
+        this.carsSource.next(updatedCars);
+      })
+    );
   }
 }

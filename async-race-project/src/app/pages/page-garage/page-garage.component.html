@@ -12,14 +12,17 @@
     <app-input-create></app-input-create>
     <app-input-update></app-input-update>
     <div>
-    <app-input-hundred></app-input-hundred>
+      <app-input-hundred></app-input-hundred>
     </div>
   </main>
   <section class="section-content">
     <div *ngIf="cars.length > 0; else noCars">
       <ul>
         <li class="cars-list" *ngFor="let car of paginatedCars">
-          <button (click)="deleteCar(car.id)">Remove</button>
+          <div>
+            <button (click)="selectCar(car.id)">Select</button>
+            <button (click)="deleteCar(car.id)">Remove</button>
+          </div>
           <div>
             <p>Car ID: {{ car.id }}</p>
             <p>Car Brand: {{ car.name }}</p>

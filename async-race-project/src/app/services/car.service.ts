@@ -40,4 +40,10 @@ export class CarService {
     const updatedCars = currentCars.filter((car) => car.id !== id);
     this.carsSource.next(updatedCars);
   }
+
+  updateCar(updatedCar: Car): void {
+    const currentCars = this.carsSource.value;
+    const updatedCars = currentCars.map((car) => (car.id === updatedCar.id ? updatedCar : car));
+    this.carsSource.next(updatedCars);
+  }
 }

@@ -31,5 +31,11 @@ export class InputCreateComponent {
     const newCar = { id: this.generateUniqueId(), name: this.userText, color: this.userColor };
     this.carService.addCar(newCar);
     this.dataService.changeData({ text: this.userText, color: this.userColor });
+    this.resetForm();
   }
+  resetForm(): void {
+    this.userText = '';
+    this.userColor = '#000000';
+  }
+
 }

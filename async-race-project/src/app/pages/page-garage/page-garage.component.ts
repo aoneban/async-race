@@ -5,6 +5,7 @@ import { InputCreateComponent } from '../../components/input-create/input-create
 import { InputUpdateComponent } from '../../components/input-update/input-update.component';
 import { InputHundredComponent } from '../../components/input-hundred/input-hundred.component';
 import { CarService } from '../../services/car.service';
+import { ServiceId } from '../../services/service-id.service';
 
 interface Car {
   id: number;
@@ -24,8 +25,9 @@ export class PageGarageComponent implements OnInit {
   cars: Car[] = [];
   currentPage = 1;
   itemsCarPages = 7;
+  isButtonDisabled = false;
 
-  constructor(private carService: CarService) {}
+  constructor(private carService: CarService, private serviceId: ServiceId) {}
 
   ngOnInit(): void {
     this.carService.currentCars.subscribe((cars) => {
@@ -57,5 +59,9 @@ export class PageGarageComponent implements OnInit {
 
   deleteCar(id: number) {
     this.carService.deleteCar(id);
+  }
+
+  selectCar(carId: number) {
+    this.serviceId.setSelectedId(carId);
   }
 }

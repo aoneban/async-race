@@ -2,9 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Nanum+Gothic&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Play:wght@400;700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 
-:root {
+/* :root {
   --bg-image: url('assets/images/bg.jpg');
-}
+} */
 
 body {
   font-family: "Play", sans-serif;

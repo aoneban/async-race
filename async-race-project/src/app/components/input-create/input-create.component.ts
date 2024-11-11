@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NewCarDataService } from '../../services/newCarData.service';
 import { CarService } from '../../services/car.service';
 
 @Component({
@@ -15,7 +14,6 @@ export class InputCreateComponent {
   userColor = '#000000';
 
   constructor(
-    private dataService: NewCarDataService,
     private carService: CarService
   ) {}
 
@@ -23,19 +21,15 @@ export class InputCreateComponent {
     return Date.now() + Math.floor(Math.random() * 1000);
   }
 
-  sendData() {
-    if (!this.userText) {
-      alert('Please enter a car brand.');
-      return;
-    }
-    const newCar = { id: this.generateUniqueId(), name: this.userText, color: this.userColor };
-    this.carService.addCar(newCar);
-    this.dataService.changeData({ text: this.userText, color: this.userColor });
-    this.resetForm();
+  createCar() {
+    const newCar = { name: this.userText, color: this.userColor };
+    this.carService.createCar(newCar).subscribe((car) => {
+      console.log('Car created:', car);
+      this.resetForm();
+    });
   }
   resetForm(): void {
     this.userText = '';
     this.userColor = '#000000';
   }
-
 }

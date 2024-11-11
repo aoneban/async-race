@@ -25,9 +25,11 @@ export class PageGarageComponent implements OnInit {
   cars: Car[] = [];
   currentPage = 1;
   itemsCarPages = 7;
-  isButtonDisabled = false;
 
-  constructor(private carService: CarService, private serviceId: ServiceId) {}
+  constructor(
+    private carService: CarService,
+    private serviceId: ServiceId
+  ) {}
 
   ngOnInit(): void {
     this.carService.currentCars.subscribe((cars) => {
@@ -57,8 +59,10 @@ export class PageGarageComponent implements OnInit {
     }
   }
 
-  deleteCar(id: number) {
-    this.carService.deleteCar(id);
+  deleteCar(id: number): void {
+    this.carService.deleteCar(id).subscribe(() => {
+      console.log(`Car with id ${id} was deleted`);
+    });
   }
 
   selectCar(carId: number) {

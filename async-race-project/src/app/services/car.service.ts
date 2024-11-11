@@ -34,11 +34,23 @@ export class CarService {
     const currentCars = this.carsSource.value;
     this.carsSource.next([...currentCars, car]);
   }
+  createCar(car: { name: string; color: string }): Observable<Car> {
+    return this.http.post<Car>(this.apiUrl, car).pipe(
+      tap((newCar) => {
+        const currentCars = this.carsSource.value;
+        this.carsSource.next([...currentCars, newCar]);
+      })
+    );
+  }
 
-  deleteCar(id: number) {
-    const currentCars = this.carsSource.value;
-    const updatedCars = currentCars.filter((car) => car.id !== id);
-    this.carsSource.next(updatedCars);
+  deleteCar(id: number): Observable<object> {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        const currentCars = this.carsSource.value;
+        const updatedCars = currentCars.filter((car) => car.id !== id);
+        this.carsSource.next(updatedCars);
+      })
+    );
   }
 
   updateCar(updatedCar: Car): void {

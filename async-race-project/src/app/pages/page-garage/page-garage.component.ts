@@ -52,7 +52,6 @@ export class PageGarageComponent implements OnInit {
       this.engineControl.drive(carId);
     }
   }
-  
   stopAnimation(carId: number): void {
     if (this.engineControl) {
       this.engineControl.stopAnimation(carId);

@@ -52,10 +52,23 @@ export class PageGarageComponent implements OnInit {
       this.engineControl.drive(carId);
     }
   }
+
+  driveAll(): void {
+    this.cars.forEach((car) => {
+      this.drive(car.id);
+    });
+  }
+
   stopAnimation(carId: number): void {
     if (this.engineControl) {
       this.engineControl.stopAnimation(carId);
     }
+  }
+
+  stopAllAnimations(): void {
+    this.cars.forEach((car) => {
+      this.stopAnimation(car.id);
+    });
   }
 
   get totalPages(): number {

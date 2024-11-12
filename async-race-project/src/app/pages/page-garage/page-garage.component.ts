@@ -29,6 +29,8 @@ interface Car {
   styleUrl: './page-garage.component.css',
 })
 export class PageGarageComponent implements OnInit {
+  @ViewChild(EngineControlComponent) engineControl!: EngineControlComponent;
+
   title = 'async-race-app';
   cars: Car[] = [];
   currentPage = 1;
@@ -36,7 +38,7 @@ export class PageGarageComponent implements OnInit {
 
   constructor(
     private carService: CarService,
-    private serviceId: ServiceId,
+    private serviceId: ServiceId
   ) {}
 
   ngOnInit(): void {
@@ -45,15 +47,15 @@ export class PageGarageComponent implements OnInit {
     });
   }
 
-  @ViewChild(EngineControlComponent) engineControl!: EngineControlComponent;
-  startEngine(carId: number): void {
+  drive(carId: number): void {
     if (this.engineControl) {
-      this.engineControl.startEngine(carId);
+      this.engineControl.drive(carId);
     }
   }
-  stopEngine(carId: number): void {
+  
+  stopAnimation(carId: number): void {
     if (this.engineControl) {
-      this.engineControl.stopEngine(carId);
+      this.engineControl.stopAnimation(carId);
     }
   }
 
@@ -80,9 +82,7 @@ export class PageGarageComponent implements OnInit {
   }
 
   deleteCar(id: number): void {
-    this.carService.deleteCar(id).subscribe(() => {
-      console.log(`Car with id ${id} was deleted`);
-    });
+    this.carService.deleteCar(id).subscribe();
   }
 
   selectCar(carId: number) {

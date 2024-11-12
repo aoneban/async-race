@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, switchMap, map } from 'rxjs/operators';
 
 interface Car {
   id: number;
@@ -14,6 +14,10 @@ interface EngineStatus {
   distance: number;
 }
 
+interface DriveResponse {
+  success: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -22,7 +26,7 @@ export class CarService {
   currentCars = this.carsSource.asObservable();
 
   private apiUrl = 'http://localhost:3000/garage';
-  private apiUrl2 = 'http://localhost:3000/engine';
+  private apiUrlEngine = 'http://localhost:3000/engine';
 
   constructor(private http: HttpClient) {
     this.loadInitialCars();
@@ -70,8 +74,18 @@ export class CarService {
     );
   }
 
-  controlEngine(id: number, status: 'started' | 'stopped' | 'drive'): Observable<EngineStatus> {
-    const params = new HttpParams().set('id', id.toString()).set('status', status);
-    return this.http.patch<EngineStatus>(`${this.apiUrl2}`, {}, { params });
+  controlEngine(id: number): Observable<{ engineStatus: EngineStatus; driveResponse: DriveResponse }> {
+    const startParams = new HttpParams().set('id', id.toString()).set('status', 'started');
+    const driveParams = new HttpParams().set('id', id.toString()).set('status', 'drive');
+    return this.http.patch<EngineStatus>(`${this.apiUrlEngine}`, {}, { params: startParams }).pipe(
+      tap((startResponse) => {
+        console.log('Start Engine Response:', startResponse);
+      }),
+      switchMap((startResponse) =>
+        this.http
+          .patch<DriveResponse>(`${this.apiUrlEngine}`, {}, { params: driveParams })
+          .pipe(map((driveResponse) => ({ engineStatus: startResponse, driveResponse })))
+      )
+    );
   }
 }

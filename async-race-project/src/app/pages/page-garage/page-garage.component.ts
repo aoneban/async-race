@@ -54,13 +54,8 @@ export class PageGarageComponent implements OnInit {
   }
 
   driveAll(): void {
-    if (this.engineControl) {
-      this.cars.forEach(car => {
-        this.engineControl.drive(car.id);
-      });
-    }
+    this.engineControl.startNewRace();
   }
-
 
   stopAnimation(carId: number): void {
     if (this.engineControl) {

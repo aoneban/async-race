@@ -16,7 +16,7 @@
       <app-input-update></app-input-update>
     </div>
     <div>
-      <app-input-hundred></app-input-hundred>
+      <app-input-hundred (carsGenerated)="onCarsGenerated($event)"></app-input-hundred>
     </div>
   </main>
   <section class="section-content">
@@ -27,7 +27,7 @@
             <button (click)="selectCar(car.id)">Select</button>
             <button (click)="deleteCar(car.id)">Remove</button>
           </div>
-          <app-engine-control></app-engine-control>
+          <app-engine-control [cars]="cars" [getCarName]="getCarName"></app-engine-control>
           <div>
             <button (click)="drive(car.id)">A</button>
             <button (click)="stopAnimation(car.id)">B</button>
@@ -42,8 +42,7 @@
               height="32.000000pt"
               viewBox="0 0 231.000000 72.000000"
               preserveAspectRatio="xMidYMid meet"
-            >
-              <metadata>Created by potrace 1.16, written by Peter Selinger 2001-2019</metadata>
+            > <metadata>Created by potrace 1.16, written by Peter Selinger 2001-2019</metadata>
               <g
                 transform="translate(0.000000,72.000000) scale(0.100000,-0.100000)"
                 [attr.fill]="car.color"

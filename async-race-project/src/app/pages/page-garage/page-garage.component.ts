@@ -54,10 +54,13 @@ export class PageGarageComponent implements OnInit {
   }
 
   driveAll(): void {
-    this.cars.forEach((car) => {
-      this.drive(car.id);
-    });
+    if (this.engineControl) {
+      this.cars.forEach(car => {
+        this.engineControl.drive(car.id);
+      });
+    }
   }
+
 
   stopAnimation(carId: number): void {
     if (this.engineControl) {
@@ -99,5 +102,18 @@ export class PageGarageComponent implements OnInit {
 
   selectCar(carId: number) {
     this.serviceId.setSelectedId(carId);
+  }
+
+  getCarName(carId: number): string {
+    console.log(`getCarName called with carId: ${carId}`);
+    const car = this.cars.find((c) => c.id === carId);
+    const carName = car ? car.name : 'Unknown Car';
+    console.log(`getCarName returning: ${carName}`);
+    return carName;
+  }
+
+  onCarsGenerated(newCars: Car[]): void {
+    this.cars = newCars;
+    console.log(`Generated ${newCars.length} cars.`);
   }
 }

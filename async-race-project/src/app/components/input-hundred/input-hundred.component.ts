@@ -1,14 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { CarService } from '../../services/car.service';
 
 @Component({
   selector: 'app-input-hundred',
   standalone: true,
   imports: [],
-  templateUrl: './input-hundred.component.html',
+  template: `
+    <div class="generate-cars">
+      <button (click)="generateCars(100)">Generate Cars</button>
+    </div>
+  `,
   styleUrl: './input-hundred.component.css',
 })
 export class InputHundredComponent {
+  @Output() carsGenerated = new EventEmitter<{ id: number; name: string; color: string }[]>();
   userText = '';
   userColor = '#000000';
   constructor(private carService: CarService) {}

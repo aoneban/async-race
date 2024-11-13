@@ -154,22 +154,26 @@ export class EngineControlComponent implements AfterViewInit {
     if (this.winnerDeclared) {
       return;
     }
-
     const validRaces = this.carRaces.filter((race) => !this.errorCarIds.has(race.id) && race.endTime !== null);
-
+    console.log('Valid races:', validRaces);
     if (validRaces.length === 0) {
       alert('No cars finished without an error.');
       return;
     }
-
     const winner = validRaces.reduce((prev, curr) => {
       const prevTime = prev.endTime! - prev.startTime;
       const currTime = curr.endTime! - curr.startTime;
       return prevTime < currTime ? prev : curr;
     });
-    const raceTime = (winner.endTime! - winner.startTime) / 1000;
+    const raceTime = (winner.endTime! - winner.startTime) / this.seconds;
     alert(`${winner.name} is the winner with a time of ${raceTime.toFixed(2)} seconds!`);
-
+    this.carService.checkWinnerExists(winner.id).subscribe((exists) => {
+      if (exists) {
+        this.carService.updateWinner(winner.id, { wins: 1, time: raceTime }).subscribe();
+      } else {
+        this.carService.createWinner({ id: winner.id, wins: 1, time: raceTime }).subscribe();
+      }
+    });
     this.winnerDeclared = true;
   }
 

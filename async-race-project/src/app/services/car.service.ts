@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, catchError, } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { tap, catchError, map, switchMap } from 'rxjs/operators';
 
 interface Car {
   id: number;
   name: string;
   color: string;
+}
+
+interface Winner {
+  id: number;
+  wins: number;
+  time: number;
 }
 
 interface EngineStatus {
@@ -24,8 +30,11 @@ interface DriveResponse {
 export class CarService {
   private carsSource = new BehaviorSubject<Car[]>([]);
   currentCars = this.carsSource.asObservable();
+  private winnersSource = new BehaviorSubject<Winner[]>([]);
+  currentWinners = this.winnersSource.asObservable();
 
   private apiUrl = 'http://localhost:3000/garage';
+  private apiUrlWinner = 'http://localhost:3000/winners';
   private apiUrlEngine = 'http://localhost:3000/engine';
 
   constructor(private http: HttpClient) {
@@ -84,5 +93,45 @@ export class CarService {
     return this.http
       .patch<DriveResponse>(`${this.apiUrlEngine}`, {}, { params })
       .pipe(catchError((error: HttpErrorResponse) => throwError(error)));
+  }
+
+  checkWinnerExists(id: number): Observable<boolean> {
+    return this.http.get<Winner>(`${this.apiUrlWinner}/${id}`).pipe(
+      map(() => true),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          return of(false);
+        }
+        throw error;
+      })
+    );
+  }
+
+  createWinner(winnerData: { id: number; wins: number; time: number }): Observable<Winner> {
+    return this.checkWinnerExists(winnerData.id).pipe(
+      switchMap((exists) => {
+        if (exists) {
+          return this.updateWinner(winnerData.id, winnerData);
+        } else {
+          return this.http.post<Winner>(this.apiUrlWinner, winnerData).pipe(
+            tap((newWinner) => {
+              const currentWinners = this.winnersSource.value;
+              this.winnersSource.next([...currentWinners, newWinner]);
+            })
+          );
+        }
+      })
+    );
+  }
+
+  updateWinner(id: number, winnerData: { wins: number; time: number }): Observable<Winner> {
+    return this.http.patch<Winner>(`${this.apiUrlWinner}/${id}`, winnerData).pipe(
+      tap(() => {
+        const currentWinners = this.winnersSource.value.map((winner) =>
+          winner.id === id ? { ...winner, ...winnerData } : winner
+        );
+        this.winnersSource.next(currentWinners);
+      })
+    );
   }
 }

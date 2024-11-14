@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map, switchMap } from 'rxjs/operators';
 
@@ -10,9 +10,9 @@ interface Car {
 }
 
 interface Winner {
-  id: number;
-  wins: number;
   time: number;
+  wins: number;
+  id: number;
 }
 
 interface EngineStatus {
@@ -52,6 +52,21 @@ export class CarService {
   addCar(car: Car) {
     const currentCars = this.carsSource.value;
     this.carsSource.next([...currentCars, car]);
+  }
+
+  getWinners(
+    page = 1,
+    limit = 10,
+    sort = 'id',
+    order = 'ASC'
+  ): Observable<{ winners: Winner[]; total: number }> {
+    const queryParams = `?_page=${page}&_limit=${limit}&_sort=${sort}&_order=${order}`;
+    return this.http.get<Winner[]>(this.apiUrlWinner + queryParams, { observe: 'response' }).pipe(
+      map((response: HttpResponse<Winner[]>) => {
+        const total = parseInt(response.headers.get('X-Total-Count')!, 10);
+        return { winners: response.body || [], total };
+      })
+    );
   }
 
   createCar(car: { name: string; color: string }): Observable<Car> {

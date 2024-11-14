@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpErrorResponse, HttpResponse } from '@angula
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map, switchMap } from 'rxjs/operators';
 
-interface Car {
+export interface Car {
   id: number;
   name: string;
   color: string;

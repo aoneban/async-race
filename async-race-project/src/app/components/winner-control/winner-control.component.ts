@@ -49,10 +49,10 @@ export class WinnerControlComponent {
       if (exists) {
         this.carService.getWinner(winner.id).subscribe(existingWinner => {
           const updatedWins = existingWinner.wins + 1;
-          this.carService.updateWinner(winner.id, { wins: updatedWins, time: raceTime }).subscribe();
+          this.carService.updateWinner(winner.id, { wins: updatedWins, time: Number(raceTime.toFixed(3)) }).subscribe();
         });
       } else {
-        this.carService.createWinner({ id: winner.id, wins: 1, time: raceTime }).subscribe();
+        this.carService.createWinner({ id: winner.id, wins: 1, time: Number(raceTime.toFixed(3)) }).subscribe();
       }
     });
 

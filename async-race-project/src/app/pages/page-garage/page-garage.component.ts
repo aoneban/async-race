@@ -26,7 +26,7 @@ interface Car {
     EngineControlComponent,
   ],
   templateUrl: './page-garage.component.html',
-  styleUrl: './page-garage.component.css',
+  styleUrls: ['./page-garage.component.css'],
 })
 export class PageGarageComponent implements OnInit {
   @ViewChild(EngineControlComponent) engineControl!: EngineControlComponent;
@@ -35,6 +35,7 @@ export class PageGarageComponent implements OnInit {
   cars: Car[] = [];
   currentPage = 1;
   itemsCarPages = 7;
+  private readonly STORAGE_KEY = 'currentPage';
 
   constructor(
     private carService: CarService,
@@ -42,6 +43,11 @@ export class PageGarageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const storedPage = localStorage.getItem(this.STORAGE_KEY);
+    if (storedPage) {
+      this.currentPage = parseInt(storedPage, 10);
+    }
+
     this.carService.currentCars.subscribe((cars) => {
       this.cars = cars;
     });
@@ -82,17 +88,25 @@ export class PageGarageComponent implements OnInit {
   goToNextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
+      this.saveCurrentPage();
     }
   }
 
   goToPreviousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
+      this.saveCurrentPage();
     }
   }
 
+  saveCurrentPage(): void {
+    localStorage.setItem(this.STORAGE_KEY, this.currentPage.toString());
+  }
+
   deleteCar(id: number): void {
-    this.carService.deleteCar(id).subscribe();
+    this.carService.deleteCar(id).subscribe(() => {
+      this.cars = this.cars.filter(car => car.id !== id);
+    });
   }
 
   selectCar(carId: number) {
@@ -100,10 +114,8 @@ export class PageGarageComponent implements OnInit {
   }
 
   getCarName(carId: number): string {
-    console.log(`getCarName called with carId: ${carId}`);
     const car = this.cars.find((c) => c.id === carId);
     const carName = car ? car.name : 'Unknown Car';
-    console.log(`getCarName returning: ${carName}`);
     return carName;
   }
 

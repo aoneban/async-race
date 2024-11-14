@@ -36,7 +36,7 @@ export class PageWinnersComponent implements AfterViewInit {
   sort!: MatSort;
 
   ngAfterViewInit() {
-    this.carService.currentCars.subscribe(cars => this.cars = cars);
+    this.carService.currentCars.subscribe((cars) => (this.cars = cars));
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.getWinners();
@@ -51,27 +51,22 @@ export class PageWinnersComponent implements AfterViewInit {
   }
   getWinners() {
     this.carService.getWinners().subscribe(({ winners }) => {
-      const formattedWinners: WinnersList[] = winners.map((winner, index) => ({
-        id: winner.id,
-        name: this.getCarName(winner.id),
-        car: this.getCarColor(winner.id),
-        position: index + 1,
-        wins: winner.wins,
-        time: winner.time,
-      }));
+      const formattedWinners: WinnersList[] = winners
+        .filter((winner) => this.cars.some((car) => car.id === winner.id))
+        .map((winner, index) => ({
+          id: winner.id,
+          name: this.getCarProperty(winner.id, 'name'),
+          car: this.getCarProperty(winner.id, 'color'),
+          position: index + 1,
+          wins: winner.wins,
+          time: winner.time,
+        }));
       this.dataSource.data = formattedWinners;
     });
   }
 
-  getCarName(carId: number): string {
+  getCarProperty(carId: number, property: 'name' | 'color'): string {
     const car = this.cars.find((c) => c.id === carId);
-    const carName = car ? car.name : 'Unknown Car';
-    return carName;
-  }
-
-  getCarColor(carId: number): string {
-    const color = this.cars.find((c) => c.id === carId);
-    const carColor = color ? color.color : '';
-    return carColor;
+    return car ? car[property] : 'Car was deleted';
   }
 }

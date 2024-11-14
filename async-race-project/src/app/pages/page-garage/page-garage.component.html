@@ -18,6 +18,11 @@
     <div>
       <app-input-hundred (carsGenerated)="onCarsGenerated($event)"></app-input-hundred>
     </div>
+    <div class="pagination-controls">
+      <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
+    </div>
   </main>
   <section class="section-content">
     <div *ngIf="cars.length > 0; else noCars">
@@ -42,7 +47,8 @@
               height="32.000000pt"
               viewBox="0 0 231.000000 72.000000"
               preserveAspectRatio="xMidYMid meet"
-            > <metadata>Created by potrace 1.16, written by Peter Selinger 2001-2019</metadata>
+            >
+              <metadata>Created by potrace 1.16, written by Peter Selinger 2001-2019</metadata>
               <g
                 transform="translate(0.000000,72.000000) scale(0.100000,-0.100000)"
                 [attr.fill]="car.color"

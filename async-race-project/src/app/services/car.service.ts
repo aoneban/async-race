@@ -54,12 +54,11 @@ export class CarService {
     this.carsSource.next([...currentCars, car]);
   }
 
-  getWinners(
-    page = 1,
-    limit = 10,
-    sort = 'id',
-    order = 'ASC'
-  ): Observable<{ winners: Winner[]; total: number }> {
+  getWinner(id: number): Observable<Winner> {
+    return this.http.get<Winner>(`${this.apiUrlWinner}/${id}`);
+  }
+
+  getWinners(page = 1, limit = 10, sort = 'id', order = 'ASC'): Observable<{ winners: Winner[]; total: number }> {
     const queryParams = `?_page=${page}&_limit=${limit}&_sort=${sort}&_order=${order}`;
     return this.http.get<Winner[]>(this.apiUrlWinner + queryParams, { observe: 'response' }).pipe(
       map((response: HttpResponse<Winner[]>) => {

@@ -13,7 +13,7 @@ interface CarRace {
   standalone: true,
   imports: [],
   templateUrl: './winner-control.component.html',
-  styleUrl: './winner-control.component.css'
+  styleUrls: ['./winner-control.component.css']
 })
 
 export class WinnerControlComponent {
@@ -47,7 +47,10 @@ export class WinnerControlComponent {
 
     this.carService.checkWinnerExists(winner.id).subscribe(exists => {
       if (exists) {
-        this.carService.updateWinner(winner.id, { wins: 1, time: raceTime }).subscribe();
+        this.carService.getWinner(winner.id).subscribe(existingWinner => {
+          const updatedWins = existingWinner.wins + 1;
+          this.carService.updateWinner(winner.id, { wins: updatedWins, time: raceTime }).subscribe();
+        });
       } else {
         this.carService.createWinner({ id: winner.id, wins: 1, time: raceTime }).subscribe();
       }

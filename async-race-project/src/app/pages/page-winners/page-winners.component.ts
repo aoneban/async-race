@@ -72,7 +72,6 @@ export class PageWinnersComponent implements AfterViewInit {
   getCarColor(carId: number): string {
     const color = this.cars.find((c) => c.id === carId);
     const carColor = color ? color.color : '';
-    console.log(`color = ${carColor}`)
     return carColor;
   }
 }

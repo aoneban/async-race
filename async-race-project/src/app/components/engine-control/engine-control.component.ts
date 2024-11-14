@@ -1,9 +1,10 @@
-import { Component, AfterViewInit, Input } from '@angular/core';
+import { Component, AfterViewInit, Input, ViewChild } from '@angular/core';
 import { CarService } from '../../services/car.service';
 import { CommonModule } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
+import { WinnerControlComponent } from '../winner-control/winner-control.component';
 
 interface Car {
   id: number;
@@ -23,17 +24,17 @@ interface CarRace {
   standalone: true,
   templateUrl: './engine-control.component.html',
   styleUrls: ['./engine-control.component.css'],
-  imports: [CommonModule],
+  imports: [CommonModule, WinnerControlComponent],
 })
 export class EngineControlComponent implements AfterViewInit {
   @Input() cars: Car[] = [];
   @Input() getCarName!: (carId: number) => string;
+  @ViewChild(WinnerControlComponent) winnerControl!: WinnerControlComponent;
 
   private driveCheckSubscription: Subscription | null = null;
-  private winnerDeclared = false;
   private containerWidth = 0;
-  private carRaces: CarRace[] = [];
-  private errorCarIds = new Set<number>();
+  public carRaces: CarRace[] = [];
+  public errorCarIds = new Set<number>();
   widthCar = 270;
   speedCoeff = 5;
   seconds = 1000;
@@ -52,7 +53,7 @@ export class EngineControlComponent implements AfterViewInit {
 
   startNewRace(): void {
     this.resetRace();
-    this.cars.forEach((car) => this.drive(car.id));
+    this.cars.forEach(car => this.drive(car.id));
   }
 
   drive(carId: number): void {
@@ -66,12 +67,14 @@ export class EngineControlComponent implements AfterViewInit {
 
     this.carService.startEngine(carId).subscribe(
       (engineStatus) => {
+        console.log('Start Engine Response:', engineStatus);
         this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
         this.driveCheckSubscription = interval(2000)
           .pipe(
             switchMap(() => this.carService.checkEngineStatus(carId)),
             catchError((error: HttpErrorResponse) => {
+              console.log(`Car with ID ${carId} encountered an error:`, error);
               this.errorCarIds.add(carId);
               this.stopAnimation(carId, true);
               throw error;
@@ -102,9 +105,11 @@ export class EngineControlComponent implements AfterViewInit {
       carElement.style.transition = `transform ${duration}s linear`;
       carElement.style.transform = `translateX(${distance}px)`;
       carElement.addEventListener('transitionend', () => {
+        console.log(`Animation finished for car ${carId}`);
         this.finishRace(carId);
       });
     } else {
+      console.warn(`Car element with ID img-${carId} not found, skipping animation.`);
       this.finishRace(carId);
     }
   }
@@ -140,46 +145,22 @@ export class EngineControlComponent implements AfterViewInit {
       race.endTime = endTime;
       const raceTime = (race.endTime - race.startTime) / this.seconds;
       console.log(`Car ${race.name} finished in ${raceTime.toFixed(2)} seconds`);
+      console.log('Array carRace is:', this.carRaces);
 
       const allFinished = this.cars.every(
         (car) => this.carRaces.some((race) => race.id === car.id) || this.errorCarIds.has(car.id)
       );
+      console.log('All cars finished check:', allFinished);
       if (allFinished) {
-        this.declareWinner();
+        console.log('All cars finished');
+        this.winnerControl.declareWinner();
       }
     }
-  }
-
-  declareWinner(): void {
-    if (this.winnerDeclared) {
-      return;
-    }
-    const validRaces = this.carRaces.filter((race) => !this.errorCarIds.has(race.id) && race.endTime !== null);
-    console.log('Valid races:', validRaces);
-    if (validRaces.length === 0) {
-      alert('No cars finished without an error.');
-      return;
-    }
-    const winner = validRaces.reduce((prev, curr) => {
-      const prevTime = prev.endTime! - prev.startTime;
-      const currTime = curr.endTime! - curr.startTime;
-      return prevTime < currTime ? prev : curr;
-    });
-    const raceTime = (winner.endTime! - winner.startTime) / this.seconds;
-    alert(`${winner.name} is the winner with a time of ${raceTime.toFixed(2)} seconds!`);
-    this.carService.checkWinnerExists(winner.id).subscribe((exists) => {
-      if (exists) {
-        this.carService.updateWinner(winner.id, { wins: 1, time: raceTime }).subscribe();
-      } else {
-        this.carService.createWinner({ id: winner.id, wins: 1, time: raceTime }).subscribe();
-      }
-    });
-    this.winnerDeclared = true;
   }
 
   resetRace(): void {
     this.carRaces = [];
     this.errorCarIds = new Set();
-    this.winnerDeclared = false;
+    this.winnerControl.resetWinner();
   }
 }

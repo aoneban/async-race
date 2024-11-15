@@ -1,6 +1,6 @@
 # My total result is 350/400
 
-[Link to App](https://as-race-bagiran.netlify.app/page-garage)
+[Link to App](https://as-race-bagiran.netlify.app)
 
 ## Basic Structure (80 points)
 

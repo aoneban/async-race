@@ -15,7 +15,7 @@ interface CarRace {
   standalone: true,
   imports: [MatDialogModule],
   templateUrl: './winner-control.component.html',
-  styleUrls: ['./winner-control.component.css']
+  styleUrls: ['./winner-control.component.css'],
 })
 export class WinnerControlComponent {
   @Input() carRaces: CarRace[] = [];
@@ -23,7 +23,10 @@ export class WinnerControlComponent {
 
   private winnerDeclared = false;
 
-  constructor(private carService: CarService, public dialog: MatDialog) {}
+  constructor(
+    private carService: CarService,
+    public dialog: MatDialog
+  ) {}
 
   declareWinner(): void {
     if (this.winnerDeclared) {
@@ -46,9 +49,9 @@ export class WinnerControlComponent {
 
     this.openWinnerDialog(winner.name, Number(raceTime.toFixed(3)));
 
-    this.carService.checkWinnerExists(winner.id).subscribe(exists => {
+    this.carService.checkWinnerExists(winner.id).subscribe((exists) => {
       if (exists) {
-        this.carService.getWinner(winner.id).subscribe(existingWinner => {
+        this.carService.getWinner(winner.id).subscribe((existingWinner) => {
           const updatedWins = existingWinner.wins + 1;
           this.carService.updateWinner(winner.id, { wins: updatedWins, time: Number(raceTime.toFixed(3)) }).subscribe();
         });
@@ -62,13 +65,13 @@ export class WinnerControlComponent {
 
   openWinnerDialog(winnerName: string, raceTime: number): void {
     this.dialog.open(WinnerModalComponent, {
-      data: { winnerName, raceTime }
+      data: { winnerName, raceTime },
     });
   }
 
   openNoWinnerDialog(): void {
     this.dialog.open(WinnerModalComponent, {
-      data: { winnerName: 'No cars', raceTime: 0 }
+      data: { winnerName: 'No cars', raceTime: 0 },
     });
   }
 

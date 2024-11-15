@@ -53,7 +53,7 @@ export class EngineControlComponent implements AfterViewInit {
 
   startNewRace(): void {
     this.resetRace();
-    this.cars.forEach(car => this.drive(car.id));
+    this.cars.forEach((car) => this.drive(car.id));
   }
 
   drive(carId: number): void {
@@ -78,13 +78,11 @@ export class EngineControlComponent implements AfterViewInit {
               throw error;
             })
           )
-          .subscribe(
-            (error) => {
-              console.error('Error checking engine status:', error);
-              this.errorCarIds.add(carId);
-              this.stopAnimation(carId, true);
-            }
-          );
+          .subscribe((error) => {
+            console.error('Error checking engine status:', error);
+            this.errorCarIds.add(carId);
+            this.stopAnimation(carId, true);
+          });
       },
       (error) => {
         console.error('Error starting engine:', error);

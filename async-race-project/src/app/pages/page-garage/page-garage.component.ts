@@ -105,7 +105,7 @@ export class PageGarageComponent implements OnInit {
 
   deleteCar(id: number): void {
     this.carService.deleteCar(id).subscribe(() => {
-      this.cars = this.cars.filter(car => car.id !== id);
+      this.cars = this.cars.filter((car) => car.id !== id);
     });
   }
 

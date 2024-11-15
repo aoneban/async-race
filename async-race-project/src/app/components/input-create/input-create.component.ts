@@ -13,9 +13,7 @@ export class InputCreateComponent {
   userText = '';
   userColor = '#000000';
 
-  constructor(
-    private carService: CarService
-  ) {}
+  constructor(private carService: CarService) {}
 
   createCar() {
     const newCar = { name: this.userText, color: this.userColor };

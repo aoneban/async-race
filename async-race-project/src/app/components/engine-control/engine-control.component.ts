@@ -59,12 +59,12 @@ export class EngineControlComponent implements AfterViewInit {
     this.resetRace();
     this.cars.forEach((car) => this.drive(car.id));
   }
-  
+
   startRace() {
     this.raceService.setRaceActive(true);
-    setTimeout(() => {
+    this.raceService.startRace().then(() => {
       this.raceService.setRaceActive(false);
-    }, 5000);
+    });
   }
 
   drive(carId: number): void {

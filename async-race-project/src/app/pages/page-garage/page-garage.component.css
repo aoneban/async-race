@@ -119,3 +119,11 @@
 .pagination-controls {
   margin: 10px 0 40px 0;
 }
+
+.pagination-controls button:disabled {
+  margin: 10px 0 40px 0;
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+

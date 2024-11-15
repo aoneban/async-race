@@ -91,3 +91,9 @@ a:hover {
   padding: 0;
   overflow: hidden;
 }
+
+button.negative:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5; 
+}

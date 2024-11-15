@@ -7,6 +7,7 @@ import { InputHundredComponent } from '../../components/input-hundred/input-hund
 import { CarService } from '../../services/car.service';
 import { ServiceId } from '../../services/service-id.service';
 import { EngineControlComponent } from '../../components/engine-control/engine-control.component';
+import { RaceService } from '../../services/race.service';
 
 interface Car {
   id: number;
@@ -35,14 +36,19 @@ export class PageGarageComponent implements OnInit {
   cars: Car[] = [];
   currentPage = 1;
   itemsCarPages = 7;
+  isRaceActive = false;
   private readonly STORAGE_KEY = 'currentPage';
 
   constructor(
     private carService: CarService,
-    private serviceId: ServiceId
+    private serviceId: ServiceId,
+    private raceService: RaceService
   ) {}
 
   ngOnInit(): void {
+    this.raceService.raceActive$.subscribe((isActive) => {
+      this.isRaceActive = isActive;
+    });
     const storedPage = localStorage.getItem(this.STORAGE_KEY);
     if (storedPage) {
       this.currentPage = parseInt(storedPage, 10);
@@ -104,9 +110,11 @@ export class PageGarageComponent implements OnInit {
   }
 
   deleteCar(id: number): void {
-    this.carService.deleteCar(id).subscribe(() => {
-      this.cars = this.cars.filter((car) => car.id !== id);
-    });
+    if (!this.isRaceActive) {
+      this.carService.deleteCar(id).subscribe(() => {
+        this.cars = this.cars.filter((car) => car.id !== id);
+      });
+    }
   }
 
   selectCar(carId: number) {

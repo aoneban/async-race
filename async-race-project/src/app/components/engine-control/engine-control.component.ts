@@ -5,6 +5,7 @@ import { Subscription, interval } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { WinnerControlComponent } from '../winner-control/winner-control.component';
+import { RaceService } from '../../services/race.service';
 
 interface Car {
   id: number;
@@ -39,7 +40,10 @@ export class EngineControlComponent implements AfterViewInit {
   speedCoeff = 5;
   seconds = 1000;
 
-  constructor(private carService: CarService) {}
+  constructor(
+    private carService: CarService,
+    private raceService: RaceService
+  ) {}
 
   ngAfterViewInit(): void {
     const containerElement = document.querySelector('.cars-list');
@@ -55,6 +59,13 @@ export class EngineControlComponent implements AfterViewInit {
     this.resetRace();
     this.cars.forEach((car) => this.drive(car.id));
   }
+  
+  startRace() {
+    this.raceService.setRaceActive(true);
+    setTimeout(() => {
+      this.raceService.setRaceActive(false);
+    }, 5000);
+  }
 
   drive(carId: number): void {
     const carName = this.getCarName(carId);
@@ -67,6 +78,7 @@ export class EngineControlComponent implements AfterViewInit {
 
     this.carService.startEngine(carId).subscribe(
       (engineStatus) => {
+        this.startRace();
         this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
         this.driveCheckSubscription = interval(2000)

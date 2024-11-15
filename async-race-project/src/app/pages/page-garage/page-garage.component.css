@@ -1,14 +1,24 @@
 .main {
   width: 100%;
-  margin: 30px auto -62px auto;
-  min-height: 130px;
+  margin: 30px auto 0 auto;
   padding-bottom: 0px;
   display: flex;
   flex-wrap: wrap;
   gap: 3rem;
+  flex-shrink: 1;
+}
+
+.content-cars {
+  margin-top: -60px;
+}
+
+.border-car {
+  display: flex;
+  flex-shrink: 1;
+  width: 100%;
+  height: 130px;
   background-image: url('/parebric.svg');
   background-repeat: repeat-x;
-  flex-shrink: 1;
   background-size: contain;
 }
 
@@ -89,7 +99,7 @@
 }
 
 .positive:hover {
-background-color: rgb(120, 208, 32);
+  background-color: rgb(120, 208, 32);
 }
 
 .negative {
@@ -104,4 +114,8 @@ background-color: rgb(120, 208, 32);
 
 .total-page {
   margin: 0 10px;
+}
+
+.pagination-controls {
+  margin: 10px 0 40px 0;
 }

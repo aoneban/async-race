@@ -21,7 +21,8 @@
       <app-input-hundred (carsGenerated)="onCarsGenerated($event)"></app-input-hundred>
     </div>
   </main>
-  <section>
+  <div class="border-car"></div>
+  <section class="content-cars">
     <div *ngIf="cars.length > 0; else noCars">
       <ul class="cars-wrapper">
         <li class="cars-list" *ngFor="let car of paginatedCars">

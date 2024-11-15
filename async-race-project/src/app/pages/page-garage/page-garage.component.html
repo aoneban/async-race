@@ -1,13 +1,15 @@
 <div>
   <div>
     <h1>Welcome to {{ title }}</h1>
-    <a routerLink="/">To Garage</a><br />
-    <a routerLink="/page-winners">To Winners</a>
+    <div class="routs">
+      <a routerLink="/">To Garage</a><br />
+      <a routerLink="/page-winners">To Winners</a>
+    </div>
   </div>
   <main class="main">
     <div>
-      <button (click)="driveAll()">Race</button>
-      <button (click)="stopAllAnimations()">Reset</button>
+      <button class="positive" (click)="driveAll()" style="margin-right: 10px">Race</button>
+      <button class="negative" (click)="stopAllAnimations()">Reset</button>
     </div>
     <div>
       <app-input-create></app-input-create>
@@ -18,33 +20,28 @@
     <div>
       <app-input-hundred (carsGenerated)="onCarsGenerated($event)"></app-input-hundred>
     </div>
-    <div class="pagination-controls">
-      <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">Previous</button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
-    </div>
   </main>
-  <section class="section-content">
+  <section>
     <div *ngIf="cars.length > 0; else noCars">
-      <ul>
+      <ul class="cars-wrapper">
         <li class="cars-list" *ngFor="let car of paginatedCars">
           <div>
-            <button (click)="selectCar(car.id)">Select</button>
-            <button (click)="deleteCar(car.id)">Remove</button>
+            <button class="positive" (click)="selectCar(car.id)">Select</button>
+            <button class="negative" (click)="deleteCar(car.id)">Remove</button>
           </div>
           <app-engine-control [cars]="cars" [getCarName]="getCarName"></app-engine-control>
           <div>
-            <button (click)="drive(car.id)">A</button>
-            <button (click)="stopAnimation(car.id)">B</button>
+            <button class="positive" (click)="drive(car.id)">A</button>
+            <button class="negative" (click)="stopAnimation(car.id)">B</button>
           </div>
           <div>
-            <p>{{ car.name }}</p>
+            <h3 class="car-name">{{ car.name }}</h3>
             <svg
               version="1.0"
               xmlns="http://www.w3.org/2000/svg"
               width="130"
               [attr.id]="'img-' + car.id"
-              height="32.000000pt"
+              height="22.000000pt"
               viewBox="0 0 231.000000 72.000000"
               preserveAspectRatio="xMidYMid meet"
             >
@@ -86,11 +83,14 @@
               </g>
             </svg>
           </div>
+          <img src="/start.png" class="start-img" alt="start-img" />
+          <img src="/finish.png" class="finish-img" alt="finish-img" />
         </li>
       </ul>
+      <div class="bottom-pagination"></div>
       <div class="pagination-controls">
         <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">Previous</button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <span class="total-page">Page {{ currentPage }} of {{ totalPages }}</span>
         <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">Next</button>
       </div>
     </div>

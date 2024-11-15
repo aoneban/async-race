@@ -1,10 +1,50 @@
 .main {
   width: 100%;
-  margin: 30px auto 5px auto;
-  padding-bottom: 30px;
+  margin: 30px auto -62px auto;
+  min-height: 130px;
+  padding-bottom: 0px;
   display: flex;
+  flex-wrap: wrap;
   gap: 3rem;
-  border-bottom: 1px solid white;
+  background-image: url('/parebric.svg');
+  background-repeat: repeat-x;
+  flex-shrink: 1;
+  background-size: contain;
+}
+
+.bottom-pagination {
+  width: 100%;
+  margin: -50px auto -37px auto;
+  min-height: 130px;
+  padding-bottom: 0px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  background-image: url('/parebric.svg');
+  background-repeat: repeat-x;
+  flex-shrink: 1;
+  background-size: contain;
+}
+
+.cars-wrapper li:first-child {
+  border-top: 3px dashed white;
+  margin-top: 10px;
+}
+
+.finish-img {
+  z-index: -1;
+  width: 30px;
+  position: absolute;
+  top: 7px;
+  right: 7rem;
+}
+
+.start-img {
+  z-index: -1;
+  width: 30px;
+  position: absolute;
+  top: 7px;
+  left: 16.5rem;
 }
 
 .page-container {
@@ -15,11 +55,12 @@
 
 .cars-list {
   display: flex;
+  position: relative;
+  border-bottom: 3px dashed white;
+  flex-shrink: 1;
   justify-content: start;
   align-items: center;
-  gap: 5px;
-  padding: 10px 0;
-  border-bottom: 1px solid white;
+  padding: 30px 0 10px 0;
 }
 
 .cars-list div {
@@ -27,4 +68,40 @@
   flex-direction: column;
   gap: 5px;
   margin: 5px;
+}
+
+.cars-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.car-name {
+  text-align: center;
+  position: absolute;
+  left: 5px;
+  top: -10px;
+}
+
+.positive {
+  border: 1px solid green;
+  background-color: chartreuse;
+}
+
+.positive:hover {
+background-color: rgb(120, 208, 32);
+}
+
+.negative {
+  border: 1px solid rgb(199, 30, 56);
+  background-color: rgb(159, 49, 75);
+  color: white;
+}
+
+.negative:hover {
+  background-color: rgb(91, 19, 19);
+}
+
+.total-page {
+  margin: 0 10px;
 }

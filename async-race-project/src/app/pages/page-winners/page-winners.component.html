@@ -1,7 +1,9 @@
 <div>
   <h1>Welcome to {{ title }}</h1>
-  <a routerLink="/page-garage">To Garage</a><br />
-  <a routerLink="/page-winners">To Winners</a>
+  <div class="routs">
+    <a routerLink="/page-garage">To Garage</a><br />
+    <a routerLink="/page-winners">To Winners</a>
+  </div>
   <h2>Winners</h2>
   <table
     mat-table
@@ -9,6 +11,7 @@
     matSort
     (matSortChange)="announceSortChange($event)"
     class="mat-elevation-z8"
+    class="custom-table"
   >
     <!-- Position Column -->
     <ng-container matColumnDef="id">

@@ -1,0 +1,8 @@
+.positive {
+  border: 1px solid green;
+  background-color: chartreuse;
+}
+
+.positive:hover {
+  background-color: rgb(120, 208, 32);
+  }

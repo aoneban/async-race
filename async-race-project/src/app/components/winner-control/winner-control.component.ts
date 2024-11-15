@@ -30,7 +30,6 @@ export class WinnerControlComponent {
     }
 
     const validRaces = this.carRaces.filter((race) => !this.errorCarIds.has(race.id) && race.endTime !== null);
-    console.log('Valid races:', validRaces);
 
     if (validRaces.length === 0) {
       alert('No cars finished without an error.');

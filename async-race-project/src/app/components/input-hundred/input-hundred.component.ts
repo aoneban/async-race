@@ -10,7 +10,7 @@ const models: string[] = ['Model-S', 'Forester', 'GLS', 'RX8', 'X5', 'Ceed', 'Me
   imports: [],
   template: `
     <div class="generate-cars">
-      <button (click)="generateCars(100)">Generate Cars</button>
+      <button class="positive" (click)="generateCars(100)">Generate Cars</button>
     </div>
   `,
   styleUrl: './input-hundred.component.css',

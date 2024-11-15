@@ -35,7 +35,7 @@ export class EngineControlComponent implements AfterViewInit {
   private containerWidth = 0;
   public carRaces: CarRace[] = [];
   public errorCarIds = new Set<number>();
-  widthCar = 270;
+  widthCar = 255;
   speedCoeff = 5;
   seconds = 1000;
 
@@ -67,23 +67,18 @@ export class EngineControlComponent implements AfterViewInit {
 
     this.carService.startEngine(carId).subscribe(
       (engineStatus) => {
-        console.log('Start Engine Response:', engineStatus);
         this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
         this.driveCheckSubscription = interval(2000)
           .pipe(
             switchMap(() => this.carService.checkEngineStatus(carId)),
             catchError((error: HttpErrorResponse) => {
-              console.log(`Car with ID ${carId} encountered an error:`, error);
               this.errorCarIds.add(carId);
               this.stopAnimation(carId, true);
               throw error;
             })
           )
           .subscribe(
-            (driveResponse) => {
-              console.log('Drive status check passed:', driveResponse);
-            },
             (error) => {
               console.error('Error checking engine status:', error);
               this.errorCarIds.add(carId);
@@ -105,11 +100,9 @@ export class EngineControlComponent implements AfterViewInit {
       carElement.style.transition = `transform ${duration}s linear`;
       carElement.style.transform = `translateX(${distance}px)`;
       carElement.addEventListener('transitionend', () => {
-        console.log(`Animation finished for car ${carId}`);
         this.finishRace(carId);
       });
     } else {
-      console.warn(`Car element with ID img-${carId} not found, skipping animation.`);
       this.finishRace(carId);
     }
   }
@@ -145,14 +138,11 @@ export class EngineControlComponent implements AfterViewInit {
       race.endTime = endTime;
       const raceTime = (race.endTime - race.startTime) / this.seconds;
       console.log(`Car ${race.name} finished in ${raceTime.toFixed(2)} seconds`);
-      console.log('Array carRace is:', this.carRaces);
 
       const allFinished = this.cars.every(
         (car) => this.carRaces.some((race) => race.id === car.id) || this.errorCarIds.has(car.id)
       );
-      console.log('All cars finished check:', allFinished);
       if (allFinished) {
-        console.log('All cars finished');
         this.winnerControl.declareWinner();
       }
     }

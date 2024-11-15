@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CarService } from '../../services/car.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { WinnerModalComponent } from '../modal/modal.component';
 
 interface CarRace {
   id: number;
@@ -11,18 +13,17 @@ interface CarRace {
 @Component({
   selector: 'app-winner-control',
   standalone: true,
-  imports: [],
+  imports: [MatDialogModule],
   templateUrl: './winner-control.component.html',
   styleUrls: ['./winner-control.component.css']
 })
-
 export class WinnerControlComponent {
   @Input() carRaces: CarRace[] = [];
   @Input() errorCarIds = new Set<number>();
 
   private winnerDeclared = false;
 
-  constructor(private carService: CarService) {}
+  constructor(private carService: CarService, public dialog: MatDialog) {}
 
   declareWinner(): void {
     if (this.winnerDeclared) {
@@ -32,7 +33,7 @@ export class WinnerControlComponent {
     const validRaces = this.carRaces.filter((race) => !this.errorCarIds.has(race.id) && race.endTime !== null);
 
     if (validRaces.length === 0) {
-      alert('No cars finished without an error.');
+      this.openNoWinnerDialog();
       return;
     }
 
@@ -42,7 +43,8 @@ export class WinnerControlComponent {
       return prevTime < currTime ? prev : curr;
     });
     const raceTime = (winner.endTime! - winner.startTime) / 1000;
-    alert(`${winner.name} is the winner with a time of ${raceTime.toFixed(2)} seconds!`);
+
+    this.openWinnerDialog(winner.name, Number(raceTime.toFixed(3)));
 
     this.carService.checkWinnerExists(winner.id).subscribe(exists => {
       if (exists) {
@@ -56,6 +58,18 @@ export class WinnerControlComponent {
     });
 
     this.winnerDeclared = true;
+  }
+
+  openWinnerDialog(winnerName: string, raceTime: number): void {
+    this.dialog.open(WinnerModalComponent, {
+      data: { winnerName, raceTime }
+    });
+  }
+
+  openNoWinnerDialog(): void {
+    this.dialog.open(WinnerModalComponent, {
+      data: { winnerName: 'No cars', raceTime: 0 }
+    });
   }
 
   resetWinner(): void {

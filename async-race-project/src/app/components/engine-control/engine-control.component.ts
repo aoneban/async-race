@@ -1,16 +1,15 @@
-import { Component, AfterViewInit, Input, ViewChild } from '@angular/core';
-import { CarService } from '../../services/car.service';
-import { CommonModule } from '@angular/common';
+import { Component, AfterViewInit, Input, ViewChild, OnDestroy } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
-import { WinnerControlComponent } from '../winner-control/winner-control.component';
+import { switchMap, catchError } from 'rxjs/operators';
+import { CarService } from '../../services/car.service';
 import { RaceService } from '../../services/race.service';
+import { WinnerControlComponent } from '../winner-control/winner-control.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 interface Car {
   id: number;
   name: string;
-  color: string;
 }
 
 interface CarRace {
@@ -20,6 +19,10 @@ interface CarRace {
   endTime: number | null;
 }
 
+interface DriveResponse {
+  status: 'stopped' | 'completed' | string;
+}
+
 @Component({
   selector: 'app-engine-control',
   standalone: true,
@@ -27,7 +30,7 @@ interface CarRace {
   styleUrls: ['./engine-control.component.css'],
   imports: [CommonModule, WinnerControlComponent],
 })
-export class EngineControlComponent implements AfterViewInit {
+export class EngineControlComponent implements AfterViewInit, OnDestroy {
   @Input() cars: Car[] = [];
   @Input() getCarName!: (carId: number) => string;
   @ViewChild(WinnerControlComponent) winnerControl!: WinnerControlComponent;
@@ -36,6 +39,7 @@ export class EngineControlComponent implements AfterViewInit {
   private containerWidth = 0;
   public carRaces: CarRace[] = [];
   public errorCarIds = new Set<number>();
+  public activeCarIds = new Set<number>();
   widthCar = 255;
   speedCoeff = 5;
   seconds = 1000;
@@ -55,6 +59,10 @@ export class EngineControlComponent implements AfterViewInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.clearDriveCheckSubscription();
+  }
+
   startNewRace(): void {
     this.resetRace();
     this.cars.forEach((car) => this.drive(car.id));
@@ -68,6 +76,12 @@ export class EngineControlComponent implements AfterViewInit {
   }
 
   drive(carId: number): void {
+    if (this.activeCarIds.has(carId)) {
+      console.log(`Car ${carId} is already in a race.`);
+      return;
+    }
+
+    this.activeCarIds.add(carId);
     const carName = this.getCarName(carId);
     const existingRace = this.carRaces.find((race) => race.id === carId);
 
@@ -85,35 +99,43 @@ export class EngineControlComponent implements AfterViewInit {
           .pipe(
             switchMap(() => this.carService.checkEngineStatus(carId)),
             catchError((error: HttpErrorResponse) => {
-              this.errorCarIds.add(carId);
-              this.stopAnimation(carId, true);
+              if (error.status === 500) {
+                console.error(`Error 500 for car ${carId}: Engine failure.`);
+                this.errorCarIds.add(carId);
+                this.stopAnimation(carId, true);
+                this.clearDriveCheckSubscription();
+              }
               throw error;
             })
           )
-          .subscribe((error) => {
-            console.error('Error checking engine status:', error);
-            this.errorCarIds.add(carId);
-            this.stopAnimation(carId, true);
+          .subscribe({
+            next: (response) => {
+              const driveResponse = response as unknown as DriveResponse;
+              if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
+                this.stopAnimation(carId);
+                this.clearDriveCheckSubscription();
+              }
+            },
+            error: (error: HttpErrorResponse) => {
+              console.error(`Error checking engine status for car ${carId}:`, error);
+              this.errorCarIds.add(carId);
+              this.stopAnimation(carId, true);
+              this.clearDriveCheckSubscription();
+            }
           });
       },
       (error) => {
-        console.error('Error starting engine:', error);
+        console.error(`Error starting engine for car ${carId}:`, error);
         this.errorCarIds.add(carId);
+        this.activeCarIds.delete(carId);
       }
     );
   }
 
-  animateCar(velocity: number, distance: number, carId: number): void {
-    const carElement = document.getElementById(`img-${carId}`);
-    if (carElement) {
-      const duration = distance / (velocity * this.speedCoeff);
-      carElement.style.transition = `transform ${duration}s linear`;
-      carElement.style.transform = `translateX(${distance}px)`;
-      carElement.addEventListener('transitionend', () => {
-        this.finishRace(carId);
-      });
-    } else {
-      this.finishRace(carId);
+  private clearDriveCheckSubscription() {
+    if (this.driveCheckSubscription) {
+      this.driveCheckSubscription.unsubscribe();
+      this.driveCheckSubscription = null;
     }
   }
 
@@ -128,16 +150,30 @@ export class EngineControlComponent implements AfterViewInit {
         carElement.style.transform = `translateX(${currentX}px)`;
       } else {
         carElement.style.transition = 'none';
-        carElement.style.transform = 'translateX(0)';
+        carElement.style.transform = `translateX(0)`;
       }
 
       setTimeout(() => {
         carElement.style.transition = '';
       });
 
-      if (this.driveCheckSubscription) {
-        this.driveCheckSubscription.unsubscribe();
-      }
+      this.clearDriveCheckSubscription();
+    }
+    this.activeCarIds.delete(carId);
+  }
+
+
+  animateCar(velocity: number, distance: number, carId: number): void {
+    const carElement = document.getElementById(`img-${carId}`);
+    if (carElement) {
+      const duration = distance / (velocity * this.speedCoeff);
+      carElement.style.transition = `transform ${duration}s linear`;
+      carElement.style.transform = `translateX(${distance}px)`;
+      carElement.addEventListener('transitionend', () => {
+        this.finishRace(carId);
+      });
+    } else {
+      this.finishRace(carId);
     }
   }
 
@@ -156,11 +192,14 @@ export class EngineControlComponent implements AfterViewInit {
         this.winnerControl.declareWinner();
       }
     }
+    this.clearDriveCheckSubscription();
   }
 
   resetRace(): void {
     this.carRaces = [];
     this.errorCarIds = new Set();
+    this.activeCarIds = new Set();
     this.winnerControl.resetWinner();
+    this.clearDriveCheckSubscription();
   }
 }

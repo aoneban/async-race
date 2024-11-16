@@ -1,21 +1,25 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class RaceService {
-  private raceActiveSubject = new BehaviorSubject<boolean>(false);
-  raceActive$ = this.raceActiveSubject.asObservable();
+  private raceActiveSubjects: Record<number, BehaviorSubject<boolean>> = {};
 
-  setRaceActive(isActive: boolean) {
-    this.raceActiveSubject.next(isActive);
+  getRaceActive$(carId: number): Observable<boolean> {
+    if (!this.raceActiveSubjects[carId]) {
+      this.raceActiveSubjects[carId] = new BehaviorSubject<boolean>(false);
+    }
+    return this.raceActiveSubjects[carId].asObservable();
   }
-  startRace(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 5000);
-    });
+
+  setRaceActive(carId: number, isActive: boolean) {
+    if (!this.raceActiveSubjects[carId]) {
+      this.raceActiveSubjects[carId] = new BehaviorSubject<boolean>(false);
+    }
+    this.raceActiveSubjects[carId].next(isActive);
   }
 }
+
+

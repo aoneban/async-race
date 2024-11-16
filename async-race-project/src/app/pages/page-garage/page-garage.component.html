@@ -28,7 +28,7 @@
         <li class="cars-list" *ngFor="let car of paginatedCars">
           <div>
             <button class="positive" (click)="selectCar(car.id)">Select</button>
-            <button class="negative" (click)="deleteCar(car.id)" [disabled]="isRaceActive">Remove</button>
+            <button class="negative" (click)="deleteCar(car.id)" [disabled]="isRaceActive(car.id) | async">Remove</button>
           </div>
           <app-engine-control [cars]="cars" [getCarName]="getCarName"></app-engine-control>
           <div>

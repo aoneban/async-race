@@ -68,13 +68,6 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
     this.cars.forEach((car) => this.drive(car.id));
   }
 
-  startRace() {
-    this.raceService.setRaceActive(true);
-    this.raceService.startRace().then(() => {
-      this.raceService.setRaceActive(false);
-    });
-  }
-
   drive(carId: number): void {
     if (this.activeCarIds.has(carId)) {
       console.log(`Car ${carId} is already in a race.`);
@@ -92,7 +85,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
 
     this.carService.startEngine(carId).subscribe(
       (engineStatus) => {
-        this.startRace();
+        this.raceService.setRaceActive(carId, true);
         this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
         this.driveCheckSubscription = interval(2000)
@@ -104,6 +97,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
                 this.errorCarIds.add(carId);
                 this.stopAnimation(carId, true);
                 this.clearDriveCheckSubscription();
+                this.raceService.setRaceActive(carId, false);
               }
               throw error;
             })
@@ -114,6 +108,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
               if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
                 this.stopAnimation(carId);
                 this.clearDriveCheckSubscription();
+                this.raceService.setRaceActive(carId, false);
               }
             },
             error: (error: HttpErrorResponse) => {
@@ -121,7 +116,8 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
               this.errorCarIds.add(carId);
               this.stopAnimation(carId, true);
               this.clearDriveCheckSubscription();
-            }
+              this.raceService.setRaceActive(carId, false);
+            },
           });
       },
       (error) => {
@@ -158,10 +154,10 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
       });
 
       this.clearDriveCheckSubscription();
+      this.raceService.setRaceActive(carId, false);
     }
     this.activeCarIds.delete(carId);
   }
-
 
   animateCar(velocity: number, distance: number, carId: number): void {
     const carElement = document.getElementById(`img-${carId}`);
@@ -171,9 +167,11 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
       carElement.style.transform = `translateX(${distance}px)`;
       carElement.addEventListener('transitionend', () => {
         this.finishRace(carId);
+        this.raceService.setRaceActive(carId, false);
       });
     } else {
       this.finishRace(carId);
+      this.raceService.setRaceActive(carId, false);
     }
   }
 
@@ -182,8 +180,6 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
     const race = this.carRaces.find((race) => race.id === carId);
     if (race) {
       race.endTime = endTime;
-      const raceTime = (race.endTime - race.startTime) / this.seconds;
-      console.log(`Car ${race.name} finished in ${raceTime.toFixed(2)} seconds`);
 
       const allFinished = this.cars.every(
         (car) => this.carRaces.some((race) => race.id === car.id) || this.errorCarIds.has(car.id)
@@ -193,7 +189,9 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
       }
     }
     this.clearDriveCheckSubscription();
+    this.raceService.setRaceActive(carId, false);
   }
+
 
   resetRace(): void {
     this.carRaces = [];

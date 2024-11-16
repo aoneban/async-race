@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { InputCreateComponent } from '../../components/input-create/input-create.component';
@@ -8,6 +8,7 @@ import { CarService } from '../../services/car.service';
 import { ServiceId } from '../../services/service-id.service';
 import { EngineControlComponent } from '../../components/engine-control/engine-control.component';
 import { RaceService } from '../../services/race.service';
+import { Observable } from 'rxjs';
 
 interface Car {
   id: number;
@@ -36,8 +37,9 @@ export class PageGarageComponent implements OnInit {
   cars: Car[] = [];
   currentPage = 1;
   itemsCarPages = 7;
-  isRaceActive = false;
   private readonly STORAGE_KEY = 'currentPage';
+  @Input() carId!: number;
+  isRaceActive$: Record<number, Observable<boolean>> = {};
 
   constructor(
     private carService: CarService,
@@ -46,9 +48,13 @@ export class PageGarageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.raceService.raceActive$.subscribe((isActive) => {
-      this.isRaceActive = isActive;
+    this.carService.currentCars.subscribe((cars) => {
+      this.cars = cars;
+      this.cars.forEach((car) => {
+        this.isRaceActive$[car.id] = this.raceService.getRaceActive$(car.id);
+      });
     });
+
     const storedPage = localStorage.getItem(this.STORAGE_KEY);
     if (storedPage) {
       this.currentPage = parseInt(storedPage, 10);
@@ -57,6 +63,10 @@ export class PageGarageComponent implements OnInit {
     this.carService.currentCars.subscribe((cars) => {
       this.cars = cars;
     });
+  }
+
+  isRaceActive(carId: number): Observable<boolean> {
+    return this.isRaceActive$[carId];
   }
 
   drive(carId: number): void {
@@ -110,11 +120,9 @@ export class PageGarageComponent implements OnInit {
   }
 
   deleteCar(id: number): void {
-    if (!this.isRaceActive) {
-      this.carService.deleteCar(id).subscribe(() => {
-        this.cars = this.cars.filter((car) => car.id !== id);
-      });
-    }
+    this.carService.deleteCar(id).subscribe(() => {
+      this.cars = this.cars.filter((car) => car.id !== id);
+    });
   }
 
   selectCar(carId: number) {

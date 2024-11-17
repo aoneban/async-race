@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, Input, ViewChild, OnDestroy } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
+import { Observable, Subscription, forkJoin, interval, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { CarService } from '../../services/car.service';
 import { RaceService } from '../../services/race.service';
@@ -35,7 +35,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
   @Input() getCarName!: (carId: number) => string;
   @ViewChild(WinnerControlComponent) winnerControl!: WinnerControlComponent;
 
-  private driveCheckSubscription: Subscription | null = null;
+  private driveCheckSubscription = new Map<number, Subscription>();
   private containerWidth = 0;
   public carRaces: CarRace[] = [];
   public errorCarIds = new Set<number>();
@@ -60,17 +60,101 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearDriveCheckSubscription();
+    this.clearDriveCheckSubscriptions();
   }
 
   startNewRace(): void {
     this.resetRace();
-    this.cars.forEach((car) => this.drive(car.id));
+
+    const driveObservables = this.cars.map((car) => this.driveAllCars(car.id));
+    forkJoin(driveObservables).subscribe(
+      () => {
+        console.log('All cars started successfully.');
+      },
+      (error) => {
+        console.error('Error starting some races:', error);
+      }
+    );
+  }
+
+  driveAllCars(carId: number): Observable<void> {
+    return new Observable<void>((observer) => {
+      if (this.activeCarIds.has(carId)) {
+        console.warn(`Car ${carId} is already in a race.`);
+        observer.error(`Car ${carId} is already in a race.`);
+        return;
+      }
+
+      this.activeCarIds.add(carId);
+      const carName = this.getCarName(carId);
+      const existingRace = this.carRaces.find((race) => race.id === carId);
+
+      if (!existingRace) {
+        const startTime = performance.now();
+        this.carRaces.push({ id: carId, name: carName, startTime, endTime: null });
+      }
+
+      this.carService.startEngine(carId).subscribe(
+        (engineStatus) => {
+          this.raceService.setRaceActive(carId, true);
+          this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
+
+          const driveCheckSub = interval(2200)
+            .pipe(
+              switchMap(() => this.raceService.getRaceActive$(carId)),
+              switchMap((isActive) => {
+                if (isActive) {
+                  return this.carService.checkEngineStatus(carId);
+                } else {
+                  return of(null);
+                }
+              }),
+              catchError((error: HttpErrorResponse) => {
+                if (error.status === 500) {
+                  console.error(`Error 500 for car ${carId}: Engine failure.`);
+                  this.errorCarIds.add(carId);
+                  this.stopAnimation(carId, true);
+                  this.clearDriveCheckSubscription(carId);
+                }
+                return of(null);
+              })
+            )
+            .subscribe({
+              next: (response) => {
+                if (response) {
+                  const driveResponse = response as unknown as DriveResponse;
+                  if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
+                    this.stopAnimation(carId);
+                    this.clearDriveCheckSubscription(carId);
+                    observer.next();
+                    observer.complete();
+                  }
+                }
+              },
+              error: (error: HttpErrorResponse) => {
+                console.error(`Error checking engine status for car ${carId}:`, error);
+                this.errorCarIds.add(carId);
+                this.stopAnimation(carId, true);
+                this.clearDriveCheckSubscription(carId);
+                observer.error(error);
+              },
+            });
+
+          this.driveCheckSubscription.set(carId, driveCheckSub);
+        },
+        (error) => {
+          console.error(`Error starting engine for car ${carId}:`, error);
+          this.errorCarIds.add(carId);
+          this.activeCarIds.delete(carId);
+          observer.error(error);
+        }
+      );
+    });
   }
 
   drive(carId: number): void {
     if (this.activeCarIds.has(carId)) {
-      console.log(`Car ${carId} is already in a race.`);
+      console.warn(`Car ${carId} is already in a race.`);
       return;
     }
 
@@ -88,37 +172,45 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
         this.raceService.setRaceActive(carId, true);
         this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
-        this.driveCheckSubscription = interval(2000)
+        const driveCheckSub = interval(3000)
           .pipe(
-            switchMap(() => this.carService.checkEngineStatus(carId)),
+            switchMap(() => this.raceService.getRaceActive$(carId)),
+            switchMap((isActive) => {
+              if (isActive) {
+                return this.carService.checkEngineStatus(carId);
+              } else {
+                return of(null);
+              }
+            }),
             catchError((error: HttpErrorResponse) => {
               if (error.status === 500) {
                 console.error(`Error 500 for car ${carId}: Engine failure.`);
                 this.errorCarIds.add(carId);
                 this.stopAnimation(carId, true);
-                this.clearDriveCheckSubscription();
-                this.raceService.setRaceActive(carId, false);
+                this.clearDriveCheckSubscription(carId);
               }
-              throw error;
+              return of(null);
             })
           )
           .subscribe({
             next: (response) => {
-              const driveResponse = response as unknown as DriveResponse;
-              if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
-                this.stopAnimation(carId);
-                this.clearDriveCheckSubscription();
-                this.raceService.setRaceActive(carId, false);
+              if (response) {
+                const driveResponse = response as unknown as DriveResponse;
+                if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
+                  this.stopAnimation(carId);
+                  this.clearDriveCheckSubscription(carId);
+                }
               }
             },
             error: (error: HttpErrorResponse) => {
               console.error(`Error checking engine status for car ${carId}:`, error);
               this.errorCarIds.add(carId);
               this.stopAnimation(carId, true);
-              this.clearDriveCheckSubscription();
-              this.raceService.setRaceActive(carId, false);
+              this.clearDriveCheckSubscription(carId);
             },
           });
+
+        this.driveCheckSubscription.set(carId, driveCheckSub);
       },
       (error) => {
         console.error(`Error starting engine for car ${carId}:`, error);
@@ -128,12 +220,23 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  private clearDriveCheckSubscription() {
-    if (this.driveCheckSubscription) {
-      this.driveCheckSubscription.unsubscribe();
-      this.driveCheckSubscription = null;
+  private clearDriveCheckSubscription(carId: number) {
+    const subscription = this.driveCheckSubscription.get(carId);
+    if (subscription) {
+      subscription.unsubscribe();
+      this.driveCheckSubscription.delete(carId);
     }
+    this.raceService.setRaceActive(carId, false);
   }
+
+  private clearDriveCheckSubscriptions() {
+    this.driveCheckSubscription.forEach((subscription, carId) => {
+      subscription.unsubscribe();
+      this.raceService.setRaceActive(carId, false);
+    });
+    this.driveCheckSubscription.clear();
+  }
+
 
   stopAnimation(carId: number, error = false): void {
     const carElement = document.getElementById(`img-${carId}`);
@@ -153,8 +256,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
         carElement.style.transition = '';
       });
 
-      this.clearDriveCheckSubscription();
-      this.raceService.setRaceActive(carId, false);
+      this.clearDriveCheckSubscription(carId);
     }
     this.activeCarIds.delete(carId);
   }
@@ -167,11 +269,9 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
       carElement.style.transform = `translateX(${distance}px)`;
       carElement.addEventListener('transitionend', () => {
         this.finishRace(carId);
-        this.raceService.setRaceActive(carId, false);
       });
     } else {
       this.finishRace(carId);
-      this.raceService.setRaceActive(carId, false);
     }
   }
 
@@ -188,16 +288,14 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
         this.winnerControl.declareWinner();
       }
     }
-    this.clearDriveCheckSubscription();
-    this.raceService.setRaceActive(carId, false);
+    this.clearDriveCheckSubscription(carId);
   }
-
 
   resetRace(): void {
     this.carRaces = [];
     this.errorCarIds = new Set();
     this.activeCarIds = new Set();
     this.winnerControl.resetWinner();
-    this.clearDriveCheckSubscription();
+    this.clearDriveCheckSubscriptions();
   }
 }

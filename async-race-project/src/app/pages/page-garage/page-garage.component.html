@@ -33,7 +33,7 @@
           <app-engine-control [cars]="cars" [getCarName]="getCarName"></app-engine-control>
           <div>
             <button class="positive" (click)="drive(car.id)">A</button>
-            <button class="negative" (click)="stopAnimation(car.id)">B</button>
+            <button class="negative" (click)="stopAnimation(car.id)" [disabled]="(isRaceActive(car.id) | async) === false">B</button>
           </div>
           <div>
             <h3 class="car-name">{{ car.name }}</h3>

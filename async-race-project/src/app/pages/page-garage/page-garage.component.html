@@ -8,17 +8,17 @@
   </div>
   <main class="main">
     <div>
-      <button class="positive" (click)="driveAll()" style="margin-right: 10px">Race</button>
+      <button class="positive" (click)="driveAll()" style="margin-right: 10px" [disabled]="anyRaceActive">Race</button>
       <button class="negative" (click)="stopAllAnimations()">Reset</button>
     </div>
     <div>
-      <app-input-create></app-input-create>
+      <app-input-create [isDisabled]="anyRaceActive"></app-input-create>
     </div>
     <div>
-      <app-input-update></app-input-update>
+      <app-input-update [isDisabled]="anyRaceActive"></app-input-update>
     </div>
     <div>
-      <app-input-hundred (carsGenerated)="onCarsGenerated($event)"></app-input-hundred>
+      <app-input-hundred (carsGenerated)="onCarsGenerated($event)" [isDisabled]="anyRaceActive"></app-input-hundred>
     </div>
   </main>
   <div class="border-car"></div>

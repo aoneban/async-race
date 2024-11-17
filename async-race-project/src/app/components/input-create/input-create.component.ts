@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CarService } from '../../services/car.service';
 
@@ -10,6 +10,7 @@ import { CarService } from '../../services/car.service';
   styleUrl: './input-create.component.css',
 })
 export class InputCreateComponent {
+  @Input() isDisabled = false;
   userText = '';
   userColor = '#000000';
 

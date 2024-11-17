@@ -1,12 +1,12 @@
 <div class="update-car">
 
   <div>
-    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="text" />
+    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="text" [disabled]="isDisabled" />
   </div>
 
   <div>
-    <input id="color-input" type="color" [(ngModel)]="color" />
+    <input id="color-input" type="color" [(ngModel)]="color" [disabled]="isDisabled" />
   </div>
 
-  <button (click)="updateCar()">Update</button>
+  <button (click)="updateCar()" [disabled]="isDisabled">Update</button>
 </div>

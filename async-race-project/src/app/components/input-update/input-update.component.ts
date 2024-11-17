@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CarService } from '../../services/car.service';
 import { ServiceId } from '../../services/service-id.service';
@@ -11,6 +11,8 @@ import { ServiceId } from '../../services/service-id.service';
   styleUrl: './input-update.component.css',
 })
 export class InputUpdateComponent implements OnInit {
+  @Input() isDisabled = false;
+  
   selectedId: number | null = null;
   text = '';
   color = '#000000';

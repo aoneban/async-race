@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CarService } from '../../services/car.service';
 
 const cars: string[] = ['Tesla', 'Subaru', 'Mercedes', 'Audi', 'BMW', 'KIA', 'Renault', 'Toyota', 'Honda', 'Suzuki'];
@@ -10,12 +10,13 @@ const models: string[] = ['Model-S', 'Forester', 'GLS', 'RX8', 'X5', 'Ceed', 'Me
   imports: [],
   template: `
     <div class="generate-cars">
-      <button class="positive" (click)="generateCars(100)">Generate Cars</button>
+      <button class="positive" (click)="generateCars(100)" [disabled]="isDisabled">Generate Cars</button>
     </div>
   `,
   styleUrl: './input-hundred.component.css',
 })
 export class InputHundredComponent {
+  @Input() isDisabled = false;
   @Output() carsGenerated = new EventEmitter<{ id: number; name: string; color: string }[]>();
   userText = '';
   userColor = '#000000';

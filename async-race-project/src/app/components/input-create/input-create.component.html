@@ -1,12 +1,12 @@
 <div class="create-car">
 
   <div>
-    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="userText" />
+    <input id="text-input" type="text" placeholder="TYPE CAR BRAND"[(ngModel)]="userText" [disabled]="isDisabled"/>
   </div>
 
   <div>
-    <input id="color-input" type="color" [(ngModel)]="userColor" />
+    <input id="color-input" type="color" [(ngModel)]="userColor" [disabled]="isDisabled" />
   </div>
 
-  <button class="positive" (click)="createCar()">Create</button>
+  <button class="positive" (click)="createCar()" [disabled]="isDisabled">Create</button>
 </div>

@@ -42,8 +42,8 @@
 - [Done] **Start Race Button (10 points):** Start button should start the race for all cars on the current page.
 - [Done] **Reset Race Button (15 points):** Reset button should return all cars to their starting positions.
 - [Done] **Winner Announcement (5 points):** After some car finishes first user should see the message contains car's name that shows which one has won.
-- [None] **Button States (20 points):** Start engine button should be disabled in case car is already in driving mode. As well as stop engine button should be disabled when car is on it's initial place.
-- [Part] **Actions during the race (50 points):** Control over actions during a running race. Such as, deleting or editing a car, changing a page or view. Adding new cars. You can block buttons and stop the race. The main thing is to ensure predictable operation of the application.
+- [Done] **Button States (20 points):** Start engine button should be disabled in case car is already in driving mode. As well as stop engine button should be disabled when car is on it's initial place.
+- [Done] **Actions during the race (50 points):** Control over actions during a running race. Such as, deleting or editing a car, changing a page or view. Adding new cars. You can block buttons and stop the race. The main thing is to ensure predictable operation of the application.
 
 ## 🎨 Prettier and ESLint Configuration (10 points)
 

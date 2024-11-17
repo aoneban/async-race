@@ -5,14 +5,7 @@ import { RouterModule } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { CarService, Car } from '../../services/car.service';
-
-export interface WinnersList {
-  id: number;
-  name: string;
-  position: number;
-  wins: number;
-  time: number;
-}
+import { WinnersList } from '../../components/interfaces';
 
 @Component({
   selector: 'app-page-winners',
@@ -21,6 +14,7 @@ export interface WinnersList {
   templateUrl: './page-winners.component.html',
   styleUrl: './page-winners.component.css',
 })
+
 export class PageWinnersComponent implements AfterViewInit {
   private _liveAnnouncer = inject(LiveAnnouncer);
   title = 'async-race-app';
@@ -49,6 +43,7 @@ export class PageWinnersComponent implements AfterViewInit {
       this._liveAnnouncer.announce('Sorting cleared');
     }
   }
+  
   getWinners() {
     this.carService.getWinners().subscribe(({ winners }) => {
       const formattedWinners: WinnersList[] = winners

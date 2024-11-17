@@ -9,6 +9,7 @@ import { CarService } from '../../services/car.service';
   templateUrl: './input-create.component.html',
   styleUrl: './input-create.component.css',
 })
+
 export class InputCreateComponent {
   @Input() isDisabled = false;
   userText = '';

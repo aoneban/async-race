@@ -7,22 +7,7 @@ import { WinnerControlComponent } from '../winner-control/winner-control.compone
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RaceStateService } from '../../services/state.service';
-
-interface Car {
-  id: number;
-  name: string;
-}
-
-interface CarRace {
-  id: number;
-  name: string;
-  startTime: number;
-  endTime: number | null;
-}
-
-interface DriveResponse {
-  status: 'stopped' | 'completed' | string;
-}
+import { Car, CarRace, DriveResponse } from '../interfaces';
 
 @Component({
   selector: 'app-engine-control',
@@ -31,6 +16,7 @@ interface DriveResponse {
   styleUrls: ['./engine-control.component.css'],
   imports: [CommonModule, WinnerControlComponent],
 })
+
 export class EngineControlComponent implements AfterViewInit, OnDestroy {
   @Input() cars: Car[] = [];
   @Input() getCarName!: (carId: number) => string;
@@ -247,7 +233,6 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
     });
     this.driveCheckSubscription.clear();
   }
-
 
   stopAnimation(carId: number, error = false): void {
     const carElement = document.getElementById(`img-${carId}`);

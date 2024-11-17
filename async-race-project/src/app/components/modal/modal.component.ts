@@ -8,9 +8,11 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
   styleUrls: ['./modal.component.css'],
   imports: [MatDialogModule],
 })
+
 export class WinnerModalComponent {
   winnerName: string;
   raceTime: number;
+
   constructor(
     public dialogRef: MatDialogRef<WinnerModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { winnerName: string; raceTime: number }
@@ -18,6 +20,7 @@ export class WinnerModalComponent {
     this.winnerName = data.winnerName;
     this.raceTime = data.raceTime;
   }
+
   close(): void {
     this.dialogRef.close();
   }

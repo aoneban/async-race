@@ -12,7 +12,7 @@ import { ServiceId } from '../../services/service-id.service';
 })
 export class InputUpdateComponent implements OnInit {
   @Input() isDisabled = false;
-  
+
   selectedId: number | null = null;
   text = '';
   color = '#000000';
@@ -48,6 +48,7 @@ export class InputUpdateComponent implements OnInit {
       alert('Choose the car for updating.');
     }
   }
+  
   resetForm(): void {
     this.text = '';
     this.color = '#000000';

@@ -2,13 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CarService } from '../../services/car.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { WinnerModalComponent } from '../modal/modal.component';
-
-interface CarRace {
-  id: number;
-  name: string;
-  startTime: number;
-  endTime: number | null;
-}
+import { CarRace } from '../interfaces';
 
 @Component({
   selector: 'app-winner-control',
@@ -17,6 +11,7 @@ interface CarRace {
   templateUrl: './winner-control.component.html',
   styleUrls: ['./winner-control.component.css'],
 })
+
 export class WinnerControlComponent {
   @Input() carRaces: CarRace[] = [];
   @Input() errorCarIds = new Set<number>();

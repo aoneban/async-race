@@ -6,6 +6,7 @@ import { RaceService } from '../../services/race.service';
 import { WinnerControlComponent } from '../winner-control/winner-control.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { RaceStateService } from '../../services/state.service';
 
 interface Car {
   id: number;
@@ -46,7 +47,8 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private carService: CarService,
-    private raceService: RaceService
+    private raceService: RaceService,
+    private raceStateService: RaceStateService
   ) {}
 
   ngAfterViewInit(): void {
@@ -96,6 +98,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
 
       this.carService.startEngine(carId).subscribe(
         (engineStatus) => {
+          this.raceStateService.setRaceStarted(carId, true);
           this.raceService.setRaceActive(carId, true);
           this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
@@ -115,6 +118,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
                   this.errorCarIds.add(carId);
                   this.stopAnimation(carId, true);
                   this.clearDriveCheckSubscription(carId);
+                  this.raceStateService.setRaceStarted(carId, false);
                 }
                 return of(null);
               })
@@ -126,6 +130,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
                   if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
                     this.stopAnimation(carId);
                     this.clearDriveCheckSubscription(carId);
+                    this.raceStateService.setRaceStarted(carId, false);
                     observer.next();
                     observer.complete();
                   }
@@ -136,6 +141,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
                 this.errorCarIds.add(carId);
                 this.stopAnimation(carId, true);
                 this.clearDriveCheckSubscription(carId);
+                this.raceStateService.setRaceStarted(carId, false);
                 observer.error(error);
               },
             });
@@ -146,6 +152,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
           console.error(`Error starting engine for car ${carId}:`, error);
           this.errorCarIds.add(carId);
           this.activeCarIds.delete(carId);
+          this.raceStateService.setRaceStarted(carId, false);
           observer.error(error);
         }
       );
@@ -169,6 +176,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
 
     this.carService.startEngine(carId).subscribe(
       (engineStatus) => {
+        this.raceStateService.setRaceStarted(carId, true);
         this.raceService.setRaceActive(carId, true);
         this.animateCar(engineStatus.velocity, this.containerWidth - this.widthCar, carId);
 
@@ -188,6 +196,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
                 this.errorCarIds.add(carId);
                 this.stopAnimation(carId, true);
                 this.clearDriveCheckSubscription(carId);
+                this.raceStateService.setRaceStarted(carId, false);
               }
               return of(null);
             })
@@ -199,6 +208,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
                 if (driveResponse.status === 'stopped' || driveResponse.status === 'completed') {
                   this.stopAnimation(carId);
                   this.clearDriveCheckSubscription(carId);
+                  this.raceStateService.setRaceStarted(carId, false);
                 }
               }
             },
@@ -207,6 +217,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
               this.errorCarIds.add(carId);
               this.stopAnimation(carId, true);
               this.clearDriveCheckSubscription(carId);
+              this.raceStateService.setRaceStarted(carId, false);
             },
           });
 
@@ -254,6 +265,7 @@ export class EngineControlComponent implements AfterViewInit, OnDestroy {
 
       setTimeout(() => {
         carElement.style.transition = '';
+        this.raceStateService.setRaceStarted(carId, false);
       });
 
       this.clearDriveCheckSubscription(carId);

@@ -9,6 +9,7 @@ import { ServiceId } from '../../services/service-id.service';
 import { EngineControlComponent } from '../../components/engine-control/engine-control.component';
 import { RaceService } from '../../services/race.service';
 import { Observable } from 'rxjs';
+import { RaceStateService } from '../../services/state.service';
 
 interface Car {
   id: number;
@@ -44,7 +45,8 @@ export class PageGarageComponent implements OnInit {
   constructor(
     private carService: CarService,
     private serviceId: ServiceId,
-    private raceService: RaceService
+    private raceService: RaceService,
+    public raceStateService: RaceStateService
   ) {}
 
   ngOnInit(): void {

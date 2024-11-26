@@ -69,7 +69,6 @@ export class PageGarageComponent implements OnInit {
   private updateAnyRaceActive(): void {
     const anyActive = Object.values(this.isRaceActive$).some((subject) => subject.value);
     this.anyRaceActive$.next(anyActive);
-    console.log(`Any race active: ${anyActive}`);
   }
 
   isRaceActive(carId: number): Observable<boolean> {
@@ -154,5 +153,5 @@ export class PageGarageComponent implements OnInit {
     this.cars = newCars;
     console.log(`Generated ${newCars.length} cars.`);
   }
-  
+
 }
